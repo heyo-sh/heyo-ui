@@ -1,7 +1,32 @@
 # heyo-ui
 
 Monorepo for [`@heyo-sh/heyo-ui`](./packages/heyo-ui) — a flat, dense,
-developer-first React component library.
+developer-first React component library. Built on
+[Base UI](https://base-ui.com) and Tailwind CSS v4.
+
+## Install
+
+```sh
+bun add @heyo-sh/heyo-ui       # npm / pnpm / yarn all fine
+```
+
+One line in your CSS. That is the whole setup:
+
+```css
+@import "@heyo-sh/heyo-ui";
+```
+
+```tsx
+import { Button } from "@heyo-sh/heyo-ui";
+
+<Button variant="primary">Deploy</Button>;
+```
+
+No `tailwind.config.js`, no `@source`, no provider, no `cn()` helper to copy.
+The package [README](./packages/heyo-ui/README.md) covers colour modes, the
+tokens-only entry point, and every component.
+
+## Repository
 
 ```
 packages/heyo-ui              the library
@@ -27,7 +52,8 @@ bun run dev        # playground on http://localhost:5173
 | `bun run typecheck`       | Typechecks the library and the playground                        |
 | `bun run lint` / `format` | Prettier                                                         |
 | `bun run verify`          | Packs the tarball, installs it clean, asserts the one-line setup |
-| `bun run quality`         | lint + typecheck + build + verify                                |
+| `bun run smoke`           | Server-renders the whole playground                              |
+| `bun run quality`         | lint + typecheck + build + verify + smoke                        |
 
 Two checks worth knowing about, because neither is a normal unit test:
 
@@ -36,10 +62,13 @@ Two checks worth knowing about, because neither is a normal unit test:
   alone emits the component classes and that the `exports` map resolves for
   both barrel and granular imports. A broken `exports` map or a missing
   `@source` is invisible to unit tests yet breaks every consumer.
-- **`bun run --filter heyo-ui-playground smoke`** renders the whole playground
-  through `react-dom/server`, catching broken Base UI composition without
-  opening a browser. It also asserts that every entry in the section registry
-  rendered its anchor, so a renamed section can't silently break the sidebar.
+- **`bun run smoke`** renders the whole playground through `react-dom/server`,
+  catching broken Base UI composition without opening a browser. It also asserts
+  that every entry in the section registry rendered its anchor, so a renamed
+  section can't silently break the sidebar.
+
+CI runs `bun run quality` on every pull request, and the release workflow runs
+it again before anything reaches npm.
 
 ## Design rules
 
@@ -139,6 +168,19 @@ get their own, never a shared "Selection" block. A section file renders
 sidebar and gives the page its render order. Anchor ids come from the section
 title (`slugify`), which is what the sidebar links to.
 
+## Contributing
+
+Read [CONTRIBUTING.md](CONTRIBUTING.md) — it covers the workspace, the checks,
+and what adding a component involves. Before proposing one, read the design
+rules and the deliberate non-features above: several components are missing on
+purpose.
+
+User-facing changes need a changeset (`bun run changeset`). Releases are
+published only by CI; see [RELEASING.md](RELEASING.md).
+
+For questions, see [SUPPORT.md](SUPPORT.md). For vulnerabilities, use the
+private process in [SECURITY.md](SECURITY.md).
+
 ## Licence
 
-MIT
+[MIT](LICENSE)

@@ -1,0 +1,42 @@
+name: Feature request
+description: Suggest a component, a prop, or a change to the design language.
+title: "feature: "
+labels: [enhancement, needs-triage]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Start with the problem. A proposed API is welcome, but should not be required.
+
+        Please read the design rules and the deliberate non-features in the README
+        first — several components are missing on purpose, and the reasoning is
+        written down.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem to solve
+      description: What is the interface trying to do, and what makes it awkward today?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed component or API
+      description: Include the call site you would like to write.
+      render: tsx
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Include what you compose today from existing components and why it falls short.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checks
+      options:
+        - label: I searched existing issues and discussions for this idea.
+          required: true
+        - label: This cannot already be composed from an existing component plus a prop.
+          required: true
+        - label: I am willing to help test a proposed implementation.
+          required: false

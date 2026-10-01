@@ -1,0 +1,70 @@
+name: Bug report
+description: Report a reproducible problem in heyo-ui.
+title: "bug: "
+labels: [bug, needs-triage]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug. A small reproduction lets us investigate much faster.
+  - type: input
+    id: version
+    attributes:
+      label: heyo-ui version
+      description: Include the package version and your React and Tailwind versions.
+      placeholder: "@heyo-sh/heyo-ui 0.1.0, React 19.2.8, Tailwind 4.1.14"
+    validations:
+      required: true
+  - type: input
+    id: component
+    attributes:
+      label: Component
+      description: The component or utility involved, if the problem is specific to one.
+      placeholder: "Select, DataTable, heyo-scrollbar"
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Where it happens
+      options:
+        - Both colour modes
+        - Light mode only
+        - Dark mode only
+        - Server rendering only
+        - Build or install only
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: Link a repository or paste the smallest component tree that reproduces the issue. Never include secrets.
+      render: tsx
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behaviour
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behaviour
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs, stack trace, or screenshot
+      description: Remove tokens, private URLs, and personal data before posting.
+      render: shell
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checks
+      options:
+        - label: I searched existing issues and did not find a duplicate.
+          required: true
+        - label: I reproduced this with the current release and a supported React version.
+          required: true
