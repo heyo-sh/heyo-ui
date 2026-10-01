@@ -10,13 +10,13 @@ GitHub Actions.
    `@heyo-sh` organization and can publish organization packages. Do not create
    the package in npm's UI: the first approved release creates
    `@heyo-sh/heyo-ui` automatically.
-2. For the first publish only, create a **granular** npm access token. Give it a
-   short expiry, and under _Packages and scopes_ grant **Read and write** on the
-   `@heyo-sh` **scope** rather than on a package: the package does not exist yet,
-   so a package-scoped token cannot create it. No organization permissions are
-   required. The token's name is only a label; something like
-   `github-actions-heyo-ui-first-release` keeps its purpose and its disposability
-   obvious.
+2. For the first publish only, create a **classic automation** npm token. npm
+   cannot accept a trusted publisher for a package it has never seen, so that
+   one release has to authenticate with a credential. It has to be an automation
+   token: with two-factor authentication required for writes, both granular and
+   classic _publish_ tokens are answered with `EOTP: This operation requires a
+one-time password`, which no unattended job can supply. Give it a short
+   expiry — it is scaffolding for a single release.
 3. In GitHub, create an environment named `npm`, restrict it to `main`, and add
    the required reviewers you want for a production release.
 4. Add the token as the `NPM_TOKEN` secret in that `npm` environment. Do not add
@@ -28,13 +28,15 @@ GitHub Actions.
 7. After the package exists on npm, configure its **Trusted Publisher** for the
    `heyo-sh/heyo-ui` repository, the `release.yml` workflow, and the `npm`
    environment. Then delete the `NPM_TOKEN` secret, revoke the token in npm, and
-   remove the `NPM_TOKEN` / `NODE_AUTH_TOKEN` lines from the publish step in
+   remove any `NPM_TOKEN` / `NODE_AUTH_TOKEN` lines from the publish step in
    `release.yml`. The job already has the `id-token: write` permission, so npm
-   will mint short-lived credentials by itself from then on.
+   mints short-lived credentials by itself from then on — and starts attaching
+   SLSA provenance, which a token-authenticated publish does not get.
 
-npm cannot accept a trusted publisher for a package it has never seen, which is
-the only reason a token is involved at all. Treat it as scaffolding for exactly
-one release.
+This repository has completed every step above: `@heyo-sh/heyo-ui` publishes
+through trusted publishing, and there is no npm token anywhere in it. The list
+stays because it explains why the workflow asks for `id-token: write`, and
+because the next package will need it again.
 
 ## Normal release flow
 
