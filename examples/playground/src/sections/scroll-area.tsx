@@ -1,5 +1,5 @@
 import { Badge, Code, ScrollArea, Text } from "@heyo-sh/heyo-ui";
-import { Example, Section, Stack } from "./section";
+import { Section, Stack } from "./section";
 
 const lines = Array.from(
   { length: 40 },
@@ -68,7 +68,6 @@ export function ScrollAreaSection() {
       <Stack label='orientation="horizontal"'>
         <ScrollArea
           orientation="horizontal"
-          fade={false}
           className="rounded-lg bg-heyo-base ring-1 ring-heyo-line"
           viewportClassName="p-3"
         >
@@ -90,10 +89,7 @@ export function ScrollAreaSection() {
         </ScrollArea>
       </Stack>
 
-      <Example
-        label="heyo-scrollbar (native, no extra element)"
-        className="flex-col items-stretch"
-      >
+      <Stack label="heyo-scrollbar (native, no extra element)">
         <Text size="sm" tone="subtle">
           When you don't need an overlay scrollbar — tables, dialog bodies, the
           sidebar — the utility styles the browser's own.
@@ -107,7 +103,7 @@ export function ScrollAreaSection() {
             ))}
           </div>
         </div>
-      </Example>
+      </Stack>
     </Section>
   );
 }

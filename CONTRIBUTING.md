@@ -10,10 +10,10 @@ bug or a scoped proposal; use GitHub Discussions for questions and early ideas.
 Security vulnerabilities must be reported privately as described in
 [SECURITY.md](SECURITY.md).
 
-Before proposing a component, read the design rules and the **deliberate
-non-features** in the [README](README.md). Several components are missing on
-purpose, and the reasoning is written down — a context menu, a bottom sheet and
-a split pane were all removed after being built.
+Before proposing a component, read the [design rules and the **deliberate
+non-features**](packages/heyo-ui/README.md#design-rules). Several components are
+missing on purpose, and the reasoning is written down — a context menu, a bottom
+sheet and a split pane were all removed after being built.
 
 ## Local setup
 
@@ -67,10 +67,10 @@ Both run in CI on every pull request.
    exporting `<Name>Section`, registered in `sections/index.tsx` — with one
    example per prop worth seeing.
 
-Follow the design rules in the README. The short version: semantic tokens only,
-no `dark:` variants, rings rather than borders, one focus ring, dense by
-default, `className` forwarded through `cn()`, a stable `data-slot`, and no icon
-dependency.
+Follow the [design rules](packages/heyo-ui/README.md#design-rules). The short
+version: semantic tokens only, no `dark:` variants, rings rather than borders,
+one focus ring, dense by default, `className` forwarded through `cn()`, a stable
+`data-slot`, and no icon dependency.
 
 ## Pull requests
 
@@ -78,8 +78,8 @@ dependency.
 2. Explain the user-facing effect, link the related issue, and attach
    screenshots in both colour modes for anything visual.
 3. Run every check above. CI runs the same ones and must pass.
-4. Update the README when a design rule, a non-feature, or the component list
-   changes.
+4. Update `packages/heyo-ui/README.md` when a design rule, a non-feature, or the
+   component list changes.
 
 For a user-facing change, run `bun run changeset`, pick the smallest correct
 semver bump, and commit the generated file from `.changeset/`. Do not add a

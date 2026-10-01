@@ -15,7 +15,8 @@ export interface ScrollAreaProps extends ScrollAreaPrimitive.Root.Props {
   maxHeight?: string;
   /**
    * Fade the content out where it runs past an edge, so a cut-off list reads
-   * as *more below* rather than as the end of the list.
+   * as *more below* rather than as the end of the list. Applies to whichever
+   * axes `orientation` enables.
    * @default true
    */
   fade?: boolean;
@@ -48,7 +49,11 @@ export function ScrollArea({
   return (
     <ScrollAreaPrimitive.Root
       data-slot="scroll-area"
-      className={cn("relative min-h-0 overflow-hidden", className)}
+      // `min-w-0` matters as much as `min-h-0`: Base UI gives the content
+      // `min-width: fit-content`, so without it a horizontal scroll area
+      // reports a huge min-content size and stretches its parent instead of
+      // scrolling inside it.
+      className={cn("relative min-h-0 min-w-0 overflow-hidden", className)}
       style={style}
       {...props}
     >
@@ -62,12 +67,24 @@ export function ScrollArea({
           "h-full w-full overscroll-contain outline-none heyo-focus",
           // Base UI publishes which edges are overflowing; a mask keyed to them
           // means the fade is only ever present where there is more content.
-          fade && [
-            "[--fade:1.75rem]",
-            "data-[overflow-y-start]:data-[overflow-y-end]:[mask-image:linear-gradient(to_bottom,transparent_0,#000_var(--fade),#000_calc(100%-var(--fade)),transparent_100%)]",
-            "data-[overflow-y-start]:not-data-[overflow-y-end]:[mask-image:linear-gradient(to_bottom,transparent_0,#000_var(--fade))]",
-            "not-data-[overflow-y-start]:data-[overflow-y-end]:[mask-image:linear-gradient(to_bottom,#000_calc(100%-var(--fade)),transparent_100%)]",
-          ],
+          // `heyo-fade-mask` composites the two axes, so a `both` scroll area
+          // gets one mask rather than the last one declared winning. It is
+          // attached only once something actually overflows — no mask layer on
+          // a pane whose content happens to fit.
+          fade && vertical && "data-[has-overflow-y]:heyo-fade-mask",
+          fade && horizontal && "data-[has-overflow-x]:heyo-fade-mask",
+          fade &&
+            vertical && [
+              "data-[overflow-y-start]:data-[overflow-y-end]:[--heyo-fade-y:linear-gradient(to_bottom,transparent_0,#000_var(--heyo-fade),#000_calc(100%-var(--heyo-fade)),transparent_100%)]",
+              "data-[overflow-y-start]:not-data-[overflow-y-end]:[--heyo-fade-y:linear-gradient(to_bottom,transparent_0,#000_var(--heyo-fade))]",
+              "not-data-[overflow-y-start]:data-[overflow-y-end]:[--heyo-fade-y:linear-gradient(to_bottom,#000_calc(100%-var(--heyo-fade)),transparent_100%)]",
+            ],
+          fade &&
+            horizontal && [
+              "data-[overflow-x-start]:data-[overflow-x-end]:[--heyo-fade-x:linear-gradient(to_right,transparent_0,#000_var(--heyo-fade),#000_calc(100%-var(--heyo-fade)),transparent_100%)]",
+              "data-[overflow-x-start]:not-data-[overflow-x-end]:[--heyo-fade-x:linear-gradient(to_right,transparent_0,#000_var(--heyo-fade))]",
+              "not-data-[overflow-x-start]:data-[overflow-x-end]:[--heyo-fade-x:linear-gradient(to_right,#000_calc(100%-var(--heyo-fade)),transparent_100%)]",
+            ],
           viewportClassName,
         )}
       >

@@ -76,7 +76,14 @@ export function Example({ label, className, children }: ExampleProps) {
 /** Demo area that stacks instead of flowing — for fields and settings rows. */
 export function Stack({ label, className, children }: ExampleProps) {
   return (
-    <Example label={label} className={cn("flex-col items-stretch", className)}>
+    <Example
+      label={label}
+      // `flex-nowrap` is load-bearing: a *wrapping* column flex container sizes
+      // its line from the content, so one wide child (a horizontal ScrollArea,
+      // a table) would stretch the column past the page instead of being
+      // clipped by it.
+      className={cn("min-w-0 flex-col flex-nowrap items-stretch", className)}
+    >
       {children}
     </Example>
   );

@@ -392,6 +392,8 @@ export function DataTable<Row>({
                     <Table.Cell key={cell}>
                       <Skeleton
                         className="h-3.5"
+                        // One wave down the table, not forty bars in lockstep.
+                        delay={`${index * 110}ms`}
                         // Ragged widths, seeded off the position: identical bars
                         // in every row read as a loading *graphic*, not as text
                         // that is about to arrive.
@@ -451,7 +453,9 @@ export function DataTable<Row>({
               })}
 
           {isEmpty ? (
-            <Table.Row className="hover:bg-transparent">
+            /* Not a row of data, so it gets none of a row's affordances: no
+               hover tint, no leading marker, no pointer. */
+            <Table.Row placeholder>
               <Table.Cell colSpan={columnCount} className="h-auto p-0">
                 {query.trim()
                   ? (emptyFiltered ?? (

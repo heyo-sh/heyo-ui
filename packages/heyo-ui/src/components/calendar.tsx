@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, type ComponentProps } from "react";
+import { useMemo, useState, type ComponentProps, type ReactNode } from "react";
 import { cn } from "../lib/cn";
 import { ChevronLeftIcon, ChevronRightIcon } from "../lib/icons";
 
@@ -34,7 +34,7 @@ export interface DateRange {
 }
 
 /** The 6×7 grid for a month, padded with the neighbouring months' days. */
-function monthGrid(month: Date, weekStartsOn: number): Date[] {
+function monthGrid(month: Date, weekStartsOn: number): Date[][] {
   const first = new Date(month.getFullYear(), month.getMonth(), 1);
   const offset = (first.getDay() - weekStartsOn + 7) % 7;
   const start = new Date(first);
@@ -42,11 +42,13 @@ function monthGrid(month: Date, weekStartsOn: number): Date[] {
 
   // Always six rows. A grid that is five rows in February and six in March
   // makes the whole popover jump when you page through it.
-  return Array.from({ length: 42 }, (_, index) => {
-    const day = new Date(start);
-    day.setDate(start.getDate() + index);
-    return day;
-  });
+  return Array.from({ length: 6 }, (_, week) =>
+    Array.from({ length: 7 }, (_, day) => {
+      const date = new Date(start);
+      date.setDate(start.getDate() + week * 7 + day);
+      return date;
+    }),
+  );
 }
 
 /* -------------------------------------------------------------------------- */
@@ -88,6 +90,13 @@ export interface CalendarRangeProps extends CalendarBaseProps {
  * locale's month and weekday names, and the only arithmetic a calendar needs is
  * "add a day", which `Date` does correctly across DST. Pulling in a date
  * library for this would cost more than the component.
+ *
+ * The grid is laid out on a fixed 2rem cell rather than stretched to its
+ * container. Three things depend on it: the weekday headers line up with the
+ * numbers underneath them, a selected range fills edge to edge instead of
+ * leaving gaps between days, and two months side by side stay the same width as
+ * the headings above them. A calendar that stretches is a calendar whose
+ * columns drift.
  */
 export function Calendar(props: CalendarProps | CalendarRangeProps) {
   // One internal shape, because a discriminated union can't be destructured
@@ -132,13 +141,32 @@ export function Calendar(props: CalendarProps | CalendarRangeProps) {
     return Array.from({ length: 7 }, (_, index) => {
       // 2024-01-07 was a Sunday, so this walks a real week in order.
       const day = new Date(2024, 0, 7 + ((index + weekStartsOn) % 7));
-      return format.format(day).slice(0, 2);
+      // Two letters, and letters only: `short` is "Mon" in English but "pon."
+      // in Polish, and a trailing full stop in a 32px column reads as dirt.
+      return format
+        .format(day)
+        .replace(/[^\p{L}]/gu, "")
+        .slice(0, 2);
     });
   }, [locale, weekStartsOn]);
 
   const monthLabel = useMemo(
     () => new Intl.DateTimeFormat(locale, { month: "long", year: "numeric" }),
     [locale],
+  );
+
+  /** Every visible month, and its grid, computed once per render. */
+  const panels = useMemo(
+    () =>
+      Array.from({ length: months }, (_, index) => {
+        const panelMonth = addMonths(month, index);
+        return {
+          month: panelMonth,
+          label: monthLabel.format(panelMonth),
+          weeks: monthGrid(panelMonth, weekStartsOn),
+        };
+      }),
+    [month, months, monthLabel, weekStartsOn],
   );
 
   function isDisabled(date: Date) {
@@ -171,95 +199,137 @@ export function Calendar(props: CalendarProps | CalendarRangeProps) {
 
   /** The end of the range as it currently reads, real or previewed. */
   const rangeEnd = range?.to ?? (range?.from && hovered ? hovered : null);
+  const rangeStartDate =
+    range?.from && rangeEnd
+      ? range.from < rangeEnd
+        ? range.from
+        : rangeEnd
+      : (range?.from ?? null);
+  const rangeEndDate =
+    range?.from && rangeEnd
+      ? range.from < rangeEnd
+        ? rangeEnd
+        : range.from
+      : null;
 
   return (
     <div
       data-slot="calendar"
-      className={cn("flex min-w-0 flex-col gap-3", className)}
+      className={cn("flex w-fit max-w-full flex-col", className)}
       onPointerLeave={() => setHovered(null)}
       {...rest}
     >
-      <div className="flex items-center justify-between gap-2">
-        <CalendarNav
-          label="Previous month"
-          onClick={() => setMonth(addMonths(month, -1))}
-        >
-          <ChevronLeftIcon className="size-3.5" />
-        </CalendarNav>
-
-        <div className="flex flex-1 justify-around gap-2">
-          {Array.from({ length: months }, (_, index) => (
-            <span
-              key={index}
-              className="text-sm font-medium text-heyo-strong first-letter:uppercase"
-            >
-              {monthLabel.format(addMonths(month, index))}
-            </span>
-          ))}
-        </div>
-
-        <CalendarNav
-          label="Next month"
-          onClick={() => setMonth(addMonths(month, 1))}
-        >
-          <ChevronRightIcon className="size-3.5" />
-        </CalendarNav>
-      </div>
-
-      <div className="flex gap-5">
-        {Array.from({ length: months }, (_, offset) => (
-          <table
-            key={offset}
-            role="grid"
-            className="w-full border-collapse select-none"
+      <div className="flex gap-6">
+        {panels.map((panel, index) => (
+          <div
+            key={index}
+            data-slot="calendar-month"
+            className="flex flex-col gap-2"
           >
-            <thead>
-              <tr>
-                {weekdays.map((day) => (
-                  <th
-                    key={day}
-                    scope="col"
-                    abbr={day}
-                    className="pb-1 text-center text-[11px] font-medium text-heyo-subtle"
-                  >
-                    {day}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {Array.from({ length: 6 }, (_, week) => (
-                <tr key={week}>
-                  {monthGrid(addMonths(month, offset), weekStartsOn)
-                    .slice(week * 7, week * 7 + 7)
-                    .map((date) => {
-                      const shownMonth = addMonths(month, offset).getMonth();
-                      const outside = date.getMonth() !== shownMonth;
+            {/* The heading sits inside the month column, not across the whole
+                component: with two months, a single centred title has nothing
+                to line up with. */}
+            <div className="flex h-7 items-center gap-1">
+              {index === 0 ? (
+                <CalendarNav
+                  label="Previous month"
+                  onClick={() => setMonth(addMonths(month, -1))}
+                >
+                  <ChevronLeftIcon className="size-3.5" />
+                </CalendarNav>
+              ) : (
+                <span className="size-7 shrink-0" aria-hidden />
+              )}
+
+              <span
+                aria-live={index === 0 ? "polite" : undefined}
+                className="min-w-0 flex-1 truncate text-center text-sm font-medium text-heyo-strong first-letter:uppercase"
+              >
+                {panel.label}
+              </span>
+
+              {index === panels.length - 1 ? (
+                <CalendarNav
+                  label="Next month"
+                  onClick={() => setMonth(addMonths(month, 1))}
+                >
+                  <ChevronRightIcon className="size-3.5" />
+                </CalendarNav>
+              ) : (
+                <span className="size-7 shrink-0" aria-hidden />
+              )}
+            </div>
+
+            <table
+              role="grid"
+              // `border-collapse` + fixed cells: the range fill has to meet its
+              // neighbours with nothing between them.
+              className="border-collapse select-none"
+            >
+              <thead>
+                <tr>
+                  {weekdays.map((day) => (
+                    <th
+                      key={day}
+                      scope="col"
+                      abbr={day}
+                      className="size-8 pb-1 text-center align-middle text-[11px] font-normal text-heyo-subtle"
+                    >
+                      {day}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {panel.weeks.map((week, weekIndex) => (
+                  <tr key={weekIndex}>
+                    {week.map((date) => {
+                      const outside =
+                        date.getMonth() !== panel.month.getMonth();
                       const disabled = isDisabled(date);
 
                       const isStart = Boolean(
-                        range?.from && isSameDay(date, range.from),
+                        rangeStartDate && isSameDay(date, rangeStartDate),
                       );
                       const isEnd = Boolean(
-                        rangeEnd && isSameDay(date, rangeEnd),
+                        rangeEndDate && isSameDay(date, rangeEndDate),
                       );
                       const inRange = Boolean(
-                        range?.from &&
-                        rangeEnd &&
-                        date >
-                          (range.from < rangeEnd ? range.from : rangeEnd) &&
-                        date < (range.from < rangeEnd ? rangeEnd : range.from),
+                        rangeStartDate &&
+                        rangeEndDate &&
+                        date > rangeStartDate &&
+                        date < rangeEndDate,
                       );
                       const selected =
                         (selectedDate && isSameDay(date, selectedDate)) ||
                         isStart ||
                         isEnd;
 
+                      // The continuous band lives on the cell, so it runs the
+                      // full column width and meets its neighbours with nothing
+                      // in between; the pill stays on the button. The two ends
+                      // get half a cell of band, pointing inwards — a hard stop
+                      // under the pill rather than a gap beside it.
+                      const bounded = Boolean(rangeStartDate && rangeEndDate);
+                      const band = inRange
+                        ? "bg-heyo-brand-tint"
+                        : !bounded || (isStart && isEnd)
+                          ? null
+                          : isStart
+                            ? "bg-linear-to-r from-transparent from-50% to-heyo-brand-tint to-50%"
+                            : isEnd
+                              ? "bg-linear-to-l from-transparent from-50% to-heyo-brand-tint to-50%"
+                              : null;
+
                       return (
-                        <td key={date.toISOString()} className="p-0">
+                        <td
+                          key={date.getTime()}
+                          className={cn("size-8 p-0 align-middle", band)}
+                        >
                           <button
                             type="button"
                             disabled={disabled}
+                            tabIndex={outside ? -1 : 0}
                             aria-pressed={selected || undefined}
                             aria-current={
                               isSameDay(date, today) ? "date" : undefined
@@ -271,19 +341,19 @@ export function Calendar(props: CalendarProps | CalendarRangeProps) {
                             data-in-range={inRange ? "" : undefined}
                             data-today={isSameDay(date, today) ? "" : undefined}
                             className={cn(
-                              "relative flex size-8 cursor-pointer items-center justify-center",
+                              "relative flex size-8 cursor-pointer items-center justify-center rounded-md",
                               "text-sm tabular-nums text-heyo-default heyo-focus",
                               "transition-colors duration-75",
-                              // Square-ish, not round: the in-range fill has to
-                              // meet its neighbours edge to edge, and circles
-                              // leave gaps you can see from across the room.
-                              "rounded-md hover:bg-heyo-tint",
+                              "hover:bg-heyo-tint",
                               "data-outside:text-heyo-inactive",
-                              "data-in-range:rounded-none data-in-range:bg-heyo-brand-tint",
                               "data-selected:bg-heyo-brand data-selected:font-medium data-selected:text-heyo-on-brand",
                               "data-selected:hover:bg-heyo-brand-hover",
+                              // Today is a dot under the number, centred by
+                              // hand rather than by the flex static position,
+                              // which browsers disagree about.
                               "data-today:not-data-selected:font-semibold data-today:not-data-selected:text-heyo-strong",
                               "data-today:not-data-selected:after:absolute data-today:not-data-selected:after:bottom-1",
+                              "data-today:not-data-selected:after:left-1/2 data-today:not-data-selected:after:-translate-x-1/2",
                               "data-today:not-data-selected:after:size-1 data-today:not-data-selected:after:rounded-full",
                               "data-today:not-data-selected:after:bg-heyo-brand",
                               "disabled:pointer-events-none disabled:text-heyo-inactive disabled:line-through",
@@ -294,10 +364,11 @@ export function Calendar(props: CalendarProps | CalendarRangeProps) {
                         </td>
                       );
                     })}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         ))}
       </div>
     </div>
@@ -311,7 +382,7 @@ function CalendarNav({
 }: {
   label: string;
   onClick: () => void;
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   return (
     <button
@@ -319,7 +390,7 @@ function CalendarNav({
       aria-label={label}
       onClick={onClick}
       className={cn(
-        "inline-flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-md",
+        "inline-flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-md",
         "text-heyo-subtle transition-colors hover:bg-heyo-tint hover:text-heyo-default",
         "heyo-focus",
       )}

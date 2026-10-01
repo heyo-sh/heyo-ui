@@ -278,6 +278,25 @@
       transform: rotate(360deg);
     }
   }
+
+  /*
+   * The skeleton sweep. Long and eased rather than short and linear: a
+   * placeholder is ambient, so it should drift across the block once every
+   * couple of seconds and rest, not strobe. The pause at the end of the cycle
+   * is what keeps a table of forty bars from reading as a barber pole.
+   */
+  --animate-heyo-sweep: heyo-sweep 2.1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+
+  @keyframes heyo-sweep {
+    0% {
+      transform: translateX(-100%);
+    }
+    /* 70% of the cycle sweeps, the rest is dead air before the next pass. */
+    70%,
+    100% {
+      transform: translateX(100%);
+    }
+  }
 }
 
 /* ---------------------------------------------------------------------------
@@ -292,6 +311,16 @@
     --heyo-sidebar-width: 15rem;
     --heyo-sidebar-width-icon: 3.25rem;
     --heyo-sidebar-duration: 200ms;
+
+    /*
+     * The highlight that travels across a `Skeleton`. One step on the neutral
+     * ramp, no more — the point is that you notice the block is waiting, not
+     * that something is moving.
+     */
+    --heyo-skeleton-sheen: light-dark(
+      oklch(100% 0 0 / 0.65),
+      oklch(100% 0 0 / 0.05)
+    );
   }
 
   [data-mode="light"] {
@@ -338,6 +367,68 @@
 
   &:focus-visible {
     outline-color: var(--color-heyo-focus);
+  }
+}
+
+/*
+ * Edge fades for a scroll container, on both axes at once.
+ *
+ * Two mask layers composited with `intersect`, because a single `mask-image`
+ * can only describe one axis — declare a horizontal gradient after a vertical
+ * one and the vertical fade silently disappears. `ScrollArea` overrides
+ * `--heyo-fade-x` / `--heyo-fade-y` per overflowing edge, so the fade only
+ * exists where there is actually more content.
+ */
+@utility heyo-fade-mask {
+  --heyo-fade: 1.75rem;
+  --heyo-fade-x: linear-gradient(#000, #000);
+  --heyo-fade-y: linear-gradient(#000, #000);
+
+  -webkit-mask-image: var(--heyo-fade-x), var(--heyo-fade-y);
+  mask-image: var(--heyo-fade-x), var(--heyo-fade-y);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}
+
+/*
+ * The loading placeholder.
+ *
+ * A slow sheen travelling left to right, rather than the whole block changing
+ * opacity. A pulse makes every placeholder on the page breathe in unison, which
+ * on a dense dashboard is a dozen rectangles flashing at you; a sweep moves
+ * through one block at a time and reads as "filling in". The highlight is one
+ * step on the neutral ramp and the travel is composited (`transform`, not
+ * `background-position`), so it stays cheap even in a forty-row table.
+ */
+@utility heyo-skeleton {
+  position: relative;
+  overflow: hidden;
+  background-color: var(--color-heyo-fill);
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    /* Wider than the block and soft at both ends, so nothing has a visible
+       leading edge sliding past. */
+    background-image: linear-gradient(
+      90deg,
+      transparent 0%,
+      var(--heyo-skeleton-sheen) 50%,
+      transparent 100%
+    );
+    transform: translateX(-100%);
+    animation: var(--animate-heyo-sweep);
+    /* Custom properties inherit into pseudo-elements; `animation-delay` does
+       not. This is how `Skeleton` staggers a group of lines. */
+    animation-delay: var(--heyo-skeleton-delay, 0s);
+  }
+
+  /* Motion off: the fill alone already says "not here yet". */
+  @media (prefers-reduced-motion: reduce) {
+    &::after {
+      animation: none;
+    }
   }
 }
 
