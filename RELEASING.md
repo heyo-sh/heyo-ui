@@ -10,8 +10,13 @@ GitHub Actions.
    `@heyo-sh` organization and can publish organization packages. Do not create
    the package in npm's UI: the first approved release creates
    `@heyo-sh/heyo-ui` automatically.
-2. For the first publish only, create an npm automation or granular token with
-   publish access to that package (or to the `@heyo-sh` scope).
+2. For the first publish only, create a **granular** npm access token. Give it a
+   short expiry, and under _Packages and scopes_ grant **Read and write** on the
+   `@heyo-sh` **scope** rather than on a package: the package does not exist yet,
+   so a package-scoped token cannot create it. No organization permissions are
+   required. The token's name is only a label; something like
+   `github-actions-heyo-ui-first-release` keeps its purpose and its disposability
+   obvious.
 3. In GitHub, create an environment named `npm`, restrict it to `main`, and add
    the required reviewers you want for a production release.
 4. Add the token as the `NPM_TOKEN` secret in that `npm` environment. Do not add
@@ -22,8 +27,14 @@ GitHub Actions.
    requests and write repository contents.
 7. After the package exists on npm, configure its **Trusted Publisher** for the
    `heyo-sh/heyo-ui` repository, the `release.yml` workflow, and the `npm`
-   environment. Then remove `NPM_TOKEN`. The workflow has the required OIDC
-   permission and npm will use short-lived credentials automatically.
+   environment. Then delete the `NPM_TOKEN` secret, revoke the token in npm, and
+   remove the `NPM_TOKEN` / `NODE_AUTH_TOKEN` lines from the publish step in
+   `release.yml`. The job already has the `id-token: write` permission, so npm
+   will mint short-lived credentials by itself from then on.
+
+npm cannot accept a trusted publisher for a package it has never seen, which is
+the only reason a token is involved at all. Treat it as scaffolding for exactly
+one release.
 
 ## Normal release flow
 

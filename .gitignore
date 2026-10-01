@@ -9,3 +9,8 @@ coverage/
 .env.*
 !.env.example
 .DS_Store
+
+# Local research notes. They are drafts in whatever language they were thought
+# in, not published documentation — and keeping them untracked rather than
+# ignored means a pre-commit hook can quietly stash one away and lose it.
+docs/research-*.md
