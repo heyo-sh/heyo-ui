@@ -449,6 +449,70 @@ resolve the way you expect:
 Components also expose stable `data-slot` attributes (`button`, `input`,
 `sidebar-menu-button`, …) for global overrides and end-to-end tests.
 
+## Scrolling
+
+Two tools, and they are not interchangeable.
+
+- **`ScrollArea`** replaces the browser's scrollbar with real elements: a 6px
+  overlay thumb that appears while you hover or scroll and fades out after, plus
+  an optional mask that fades content at whichever edge still has more behind
+  it. Use it for designed surfaces — panes, cards, log views.
+- **`heyo-scrollbar`**, a plain utility, styles the _native_ scrollbar instead:
+  thin, translucent, no track, no buttons. No extra DOM, no JS, and it survives
+  anything (a `<table>` wrapper, a dialog body, the sidebar). Every scrollable
+  surface inside the library uses it.
+
+## Design rules
+
+These are the rules every component in the library follows. They are also what a
+pull request is reviewed against.
+
+1. **Semantic tokens only.** Never a raw Tailwind colour inside a component.
+   `bg-heyo-base`, not `bg-white dark:bg-neutral-900`.
+2. **No `dark:` variants.** Tokens resolve both modes with `light-dark()`;
+   `data-mode` on any ancestor switches them.
+3. **Rings, not borders,** for control edges — a border would change the box.
+   Edge colours are translucent so one value is correct on every surface.
+4. **One focus ring:** the `heyo-focus` utility. Never hand-roll it.
+5. **Dense first.** Default control height is 32px, default body text 14px.
+   Hierarchy comes from weight and colour, not size: **medium** names a surface
+   or group, **normal** lives inside one.
+6. **The sidebar is not a panel.** It shares the page background; a single
+   hairline separates it. Same rule for any pane chrome.
+7. **Every component forwards `className`** through `cn()` (clsx +
+   tailwind-merge) and sets a stable `data-slot`.
+8. **No icon dependency.** Icon props accept a component, an element, or a node.
+   The internal glyphs are Tabler paths, inlined verbatim, so they sit flush
+   with `@tabler/icons-react`.
+9. **Nothing locks the page unless it's a modal task.** `Dropdown` and `Select`
+   default to `modal={false}` — unlike Base UI — because a menu is a list of
+   things you might not do, and freezing the page behind one feels broken. Only
+   `Dialog` and `Sheet` lock scroll, because only they demand an answer.
+10. **One component per job.** There is one `Dialog` (not dialog + alert dialog
+    - confirm dialog), one bar (`Meter`, not meter + progress), one avatar
+      radius. A second component that differs by a prop is a prop.
+
+## Deliberate non-features
+
+Several components are missing on purpose. Read this before proposing one —
+three of them were built first and then removed.
+
+- **No grammars.** `CodeBlock` highlights with one regex per language, which
+  covers the snippets that actually appear in a UI — a config file, an import
+  block, a curl command — for about a kilobyte. Real grammars belong to Shiki;
+  pass its markup as `children` and the block renders it untouched.
+- **No right-click menu, no bottom sheet, no split pane.** A context menu can
+  never be the only route to an action, so it is always a second copy of a
+  `Dropdown`; a drawer is a phone pattern; a resizable pane belongs to the app's
+  layout, not to its widget library.
+- **No date library.** `Calendar` needs "add a day" and locale names, and `Date`
+  and `Intl.DateTimeFormat` do both correctly, including across DST.
+- **No typed date input.** `DatePicker` opens a calendar rather than parsing
+  text, because `3/4/25` is March for half the world and April for the other.
+- **No virtualised table.** `DataTable` filters and sorts on the client because
+  the 95% case is a page of a few hundred rows you already have. Every input is
+  also controllable, so the same component works against a server when it isn't.
+
 ## Licence
 
 MIT

@@ -8,7 +8,7 @@ body:
       value: |
         Start with the problem. A proposed API is welcome, but should not be required.
 
-        Please read the design rules and the deliberate non-features in the README
+        Please read the [design rules and the deliberate non-features](https://github.com/heyo-sh/heyo-ui/blob/main/packages/heyo-ui/README.md#design-rules)
         first — several components are missing on purpose, and the reasoning is
         written down.
   - type: textarea
