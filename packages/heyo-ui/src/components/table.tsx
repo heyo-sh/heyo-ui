@@ -63,8 +63,10 @@ function TableRoot({
             // scrolls away with the cell it's drawn on in Safari.
             "[&_thead]:shadow-[0_1px_0_var(--color-heyo-hairline)]",
           ],
-          "[&[data-striped]_tbody_tr:nth-child(even)]:bg-heyo-elevated",
-          "[&[data-interactive]_tbody_tr]:cursor-pointer",
+          // `:not([data-placeholder])` on both: an empty state or a "load
+          // more" strip is not a record, so it is neither striped nor clickable.
+          "[&[data-striped]_tbody_tr:nth-child(even):not([data-placeholder])]:bg-heyo-elevated",
+          "[&[data-interactive]_tbody_tr:not([data-placeholder])]:cursor-pointer",
           className,
         )}
         {...props}
@@ -102,13 +104,26 @@ export interface TableRowProps extends ComponentProps<"tr"> {
    * checkbox instead of leaving a lone tick to carry the state.
    */
   selected?: boolean;
+  /**
+   * This row is not a record — an empty state, a "load more" strip, a group
+   * heading. Drops every affordance a real row has: no hover tint, no leading
+   * marker, no pointer. Highlighting a "Nothing here yet" panel as you pass
+   * over it promises something to click that isn't there.
+   */
+  placeholder?: boolean;
 }
 
-function TableRow({ className, selected, ...props }: TableRowProps) {
+function TableRow({
+  className,
+  selected,
+  placeholder,
+  ...props
+}: TableRowProps) {
   return (
     <tr
       data-slot="table-row"
       data-selected={selected ? "" : undefined}
+      data-placeholder={placeholder ? "" : undefined}
       aria-selected={selected}
       className={cn(
         "group/row relative transition-colors duration-75",
@@ -116,7 +131,7 @@ function TableRow({ className, selected, ...props }: TableRowProps) {
         // row, clickable or not. The leading marker lives on the first cell
         // (see `TableCell`), because a pseudo-element on a `<tr>` cannot be
         // positioned reliably across browsers.
-        "[tbody_&]:hover:bg-heyo-tint",
+        "[tbody_&]:not-data-placeholder:hover:bg-heyo-tint",
         "data-selected:bg-heyo-brand-tint data-selected:hover:bg-heyo-brand-tint",
         className,
       )}
@@ -278,6 +293,8 @@ function TableCell({
         "first:before:transition-transform first:before:duration-100 first:before:ease-heyo",
         "group-hover/row:first:before:scale-y-100",
         "group-data-[selected]/row:first:before:scale-y-100",
+        // A placeholder row has no marker at all — see `TableRow`.
+        "group-data-[placeholder]/row:first:before:hidden",
         alignClass[align ?? (numeric ? "end" : "start")],
         numeric && "tabular-nums",
         primary && "font-medium text-heyo-strong",

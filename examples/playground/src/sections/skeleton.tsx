@@ -5,7 +5,7 @@ export function SkeletonSection() {
   return (
     <Section
       title="Skeleton"
-      description="A loading placeholder. It pulses rather than shimmers — cheaper, and far less distracting in a dense dashboard."
+      description="A loading placeholder. One faint sweep travels through it rather than the whole block pulsing — a page of pulsing rectangles all breathe at once, which is the distracting part."
     >
       <Stack label="lines" className="max-w-md">
         <Skeleton lines={3} />
@@ -15,8 +15,8 @@ export function SkeletonSection() {
         <div className="flex items-center gap-3">
           <Skeleton className="size-8 rounded-full" />
           <div className="flex flex-1 flex-col gap-1.5">
-            <Skeleton className="h-3 w-32" />
-            <Skeleton className="h-3 w-20" />
+            <Skeleton className="h-3 w-32" delay="110ms" />
+            <Skeleton className="h-3 w-20" delay="220ms" />
           </div>
         </div>
       </Stack>

@@ -394,8 +394,16 @@ Detaching the sidebar, if you want the panel look after all:
 }
 ```
 
-Three utilities you may want directly: `heyo-focus` (the standard focus ring),
-`heyo-placeholder`, and `inset-shadow-field` (the pressed-in fill on inputs).
+Utilities you may want directly:
+
+| Utility              | What it does                                                                                  |
+| -------------------- | --------------------------------------------------------------------------------------------- |
+| `heyo-focus`         | The standard focus ring. Never hand-roll it.                                                  |
+| `heyo-placeholder`   | Placeholder colour on a field.                                                                |
+| `inset-shadow-field` | The pressed-in fill on inputs.                                                                |
+| `heyo-scrollbar`     | The native scrollbar, restyled — thin, translucent, no track. No extra DOM, no JS.            |
+| `heyo-skeleton`      | The loading fill and its sweep. `--heyo-skeleton-delay` offsets it for a group.               |
+| `heyo-fade-mask`     | Edge fades on both axes at once, via `--heyo-fade-x` / `--heyo-fade-y`. Used by `ScrollArea`. |
 
 ## Icons
 

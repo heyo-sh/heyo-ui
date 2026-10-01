@@ -12,17 +12,17 @@ export function CalendarSection() {
   return (
     <Section
       title="Calendar"
-      description="A month grid, dependency-free — Intl already knows every locale's names, and Date already adds days correctly across DST."
+      description="A month grid, dependency-free — Intl already knows every locale's names, and Date already adds days correctly across DST. Fixed 2rem cells, so the columns line up with their headings and a range fills edge to edge."
     >
-      <Stack label="single" className="max-w-xs">
+      <Stack label="single" className="items-start">
         <SingleCalendar />
       </Stack>
 
-      <Stack label='mode="range" + months={2}' className="max-w-xl">
+      <Stack label='mode="range" + months={2}' className="items-start">
         <RangeCalendar />
       </Stack>
 
-      <Stack label="min / max / disabledDate" className="max-w-xs">
+      <Stack label="min / max / disabledDate" className="items-start">
         <Calendar
           min={daysFromNow(-7)}
           max={daysFromNow(21)}
@@ -33,8 +33,11 @@ export function CalendarSection() {
         </Text>
       </Stack>
 
-      <Stack label="locale / weekStartsOn" className="max-w-xs">
-        <Calendar locale="pl-PL" weekStartsOn={1} />
+      <Stack label="locale / weekStartsOn" className="items-start">
+        <div className="flex flex-wrap gap-8">
+          <Calendar locale="pl-PL" weekStartsOn={1} />
+          <Calendar locale="en-US" weekStartsOn={0} />
+        </div>
       </Stack>
     </Section>
   );
