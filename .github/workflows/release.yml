@@ -103,12 +103,3 @@ jobs:
         uses: changesets/action/publish@v2
         with:
           script: bun run release
-        env:
-          # Only needed until the package exists on npm. npm can only accept a
-          # trusted publisher for a package it already knows about, so the very
-          # first release authenticates with a short-lived granular token from
-          # the protected `npm` environment. Delete these two lines and the
-          # secret once the Trusted Publisher is configured — the job already
-          # has the `id-token: write` permission OIDC needs.
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
