@@ -1,0 +1,15 @@
+/*
+ * heyo-ui — the one-line setup.
+ *
+ *   @import "@heyo-sh/heyo-ui";
+ *
+ * Pulls in Tailwind and the heyo tokens. The build step appends an `@source`
+ * directive pointing at the compiled components, so class names survive
+ * tree-shaking without any config on your side.
+ *
+ * Already importing Tailwind yourself? Import `@heyo-sh/heyo-ui/theme.css`
+ * instead — same tokens, without the duplicate Tailwind import.
+ */
+
+@import "tailwindcss";
+@import "./theme.css";

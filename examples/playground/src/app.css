@@ -1,0 +1,5 @@
+@import "tailwindcss";
+@import "../../../packages/heyo-ui/src/styles/theme.css";
+
+/* Scan the library source (the playground aliases the package to src/). */
+@source "../../../packages/heyo-ui/src";

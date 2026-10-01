@@ -1,0 +1,76 @@
+{
+  "name": "@heyo-sh/heyo-ui",
+  "version": "0.1.0",
+  "description": "heyo-ui \u2014 a small, flat, developer-first React component library. Semantic tokens, hairline rings, no dark: variants.",
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "style": "./dist/styles.css",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "style": "./dist/styles.css",
+      "default": "./dist/index.js"
+    },
+    "./styles.css": "./dist/styles.css",
+    "./theme.css": "./dist/theme.css",
+    "./components/*": {
+      "types": "./dist/components/*.d.ts",
+      "default": "./dist/components/*.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "bun run build:js --watch",
+    "clean": "rm -rf dist",
+    "build": "bun run clean && bun run build:js && bun run build:types && bun run build:css",
+    "build:js": "bun build --root src src/index.ts src/components/accordion.tsx src/components/avatar.tsx src/components/badge.tsx src/components/breadcrumb.tsx src/components/button.tsx src/components/calendar.tsx src/components/card.tsx src/components/checkbox.tsx src/components/code-block.tsx src/components/combobox.tsx src/components/command.tsx src/components/copy-button.tsx src/components/data-table.tsx src/components/date-picker.tsx src/components/dialog.tsx src/components/dropdown.tsx src/components/empty.tsx src/components/field.tsx src/components/file-upload.tsx src/components/input.tsx src/components/kbd.tsx src/components/label.tsx src/components/meter.tsx src/components/number-field.tsx src/components/otp-field.tsx src/components/pagination.tsx src/components/popover.tsx src/components/radio.tsx src/components/scroll-area.tsx src/components/select.tsx src/components/separator.tsx src/components/sheet.tsx src/components/sidebar.tsx src/components/skeleton.tsx src/components/slider.tsx src/components/spinner.tsx src/components/stat.tsx src/components/status-bar.tsx src/components/switch.tsx src/components/table.tsx src/components/tabs.tsx src/components/text.tsx src/components/textarea.tsx src/components/timeline.tsx src/components/toast.tsx src/components/toggle.tsx src/components/tooltip.tsx src/components/tree.tsx --outdir dist --target browser --production --splitting --external react --external react-dom --external react/jsx-runtime --external @base-ui/react --banner='\"use client\";'",
+    "build:types": "tsc -p tsconfig.build.json",
+    "build:css": "bun scripts/build-css.ts",
+    "typecheck": "tsc -p tsconfig.json",
+    "verify:install": "bun scripts/verify-install.ts"
+  },
+  "dependencies": {
+    "@base-ui/react": "^1.8.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^3.6.0"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "tailwindcss": "^4.1.0"
+  },
+  "devDependencies": {
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "tailwindcss": "^4.1.14",
+    "typescript": "7.0.2"
+  },
+  "keywords": [
+    "react",
+    "ui",
+    "components",
+    "tailwind",
+    "design-system",
+    "heyo"
+  ]
+}

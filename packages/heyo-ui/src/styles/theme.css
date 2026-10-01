@@ -1,0 +1,383 @@
+/*
+ * heyo-ui — design tokens
+ * ---------------------------------------------------------------------------
+ * Every token is semantic (named by ROLE, never by hue) and resolves both
+ * colour modes at once through `light-dark()`. Components never use a `dark:`
+ * variant — you flip `data-mode="dark"` on any ancestor and the subtree follows.
+ *
+ *   <html data-mode="dark">        → dark
+ *   <html data-mode="light">       → light
+ *   <html>                         → follows the OS
+ *
+ * Import this file AFTER `@import "tailwindcss";`.
+ */
+
+@theme {
+  /* ---------------------------------------------------------------------
+   * Neutral ramp (raw values — prefer the semantic tokens below)
+   * ------------------------------------------------------------------ */
+  --color-heyo-neutral-50: #fafafa;
+  --color-heyo-neutral-100: #f4f4f5;
+  --color-heyo-neutral-200: #e4e4e7;
+  --color-heyo-neutral-300: #d4d4d8;
+  --color-heyo-neutral-400: #a1a1aa;
+  --color-heyo-neutral-500: #71717a;
+  --color-heyo-neutral-600: #52525b;
+  --color-heyo-neutral-700: #3f3f46;
+  --color-heyo-neutral-800: #27272a;
+  --color-heyo-neutral-900: #18181b;
+  --color-heyo-neutral-950: #111111;
+  --color-heyo-neutral-1000: #0a0a0a;
+
+  /* ---------------------------------------------------------------------
+   * Surfaces
+   *
+   * The dark ramp is deliberately flat and anchored on #111 as the secondary
+   * surface. Page and sidebar share one value — a sidebar that is lighter than
+   * the page reads as a floating panel, which is exactly the busyness we're
+   * avoiding. Separation comes from a single hairline, never from a fill.
+   * ------------------------------------------------------------------ */
+
+  /* Page background. Also the sidebar — same value, on purpose. */
+  --color-heyo-canvas: light-dark(#fafafa, #0a0a0a);
+
+  /* Secondary surface: cards, dialogs, menus, tables. */
+  --color-heyo-base: light-dark(#ffffff, #111111);
+
+  /* One step up from base — card footers, table stripes. */
+  --color-heyo-elevated: light-dark(#fafafa, #161616);
+
+  /* Sunken: wells, code blocks, segmented tracks, input addons. */
+  --color-heyo-recessed: light-dark(#f4f4f5, #0d0d0d);
+
+  /* Hover fill. Translucent so it works over canvas and base alike. */
+  --color-heyo-tint: light-dark(oklch(0% 0 0 / 0.045), oklch(100% 0 0 / 0.055));
+
+  /* Inverted surface. */
+  --color-heyo-contrast: light-dark(#18181b, #fafafa);
+
+  --color-heyo-overlay: light-dark(#ffffff, #161616);
+  --color-heyo-scrim: light-dark(oklch(0% 0 0 / 0.25), oklch(0% 0 0 / 0.65));
+
+  /*
+   * The sidebar reads from its own token so an app can opt out of the shared
+   * value without patching the component:
+   *   [data-mode="dark"] { --color-heyo-sidebar: #0d0d0d; }
+   */
+  --color-heyo-sidebar: var(--color-heyo-canvas);
+
+  /* ---------------------------------------------------------------------
+   * Controls
+   * ------------------------------------------------------------------ */
+  --color-heyo-control: light-dark(#ffffff, #161616);
+  /*
+   * Solid hover for *filled* controls. `tint` is translucent, which is right
+   * for ghost buttons and list rows but would let the page show through a
+   * secondary button.
+   */
+  --color-heyo-control-hover: light-dark(#f4f4f5, #1f1f1f);
+  --color-heyo-fill: light-dark(#e4e4e7, #27272a);
+  --color-heyo-fill-hover: light-dark(#d4d4d8, #3f3f46);
+  --color-heyo-interact: light-dark(#d4d4d8, #3f3f46);
+
+  /* ---------------------------------------------------------------------
+   * Edges
+   *
+   * Translucent, not solid. A solid grey line has to be re-picked for every
+   * surface it might sit on; a translucent one is correct on all of them.
+   * `hairline` is a flat seam, `line` is the edge of something raised.
+   * ------------------------------------------------------------------ */
+  --color-heyo-hairline: light-dark(
+    oklch(0% 0 0 / 0.08),
+    oklch(100% 0 0 / 0.07)
+  );
+  --color-heyo-line: light-dark(oklch(0% 0 0 / 0.13), oklch(100% 0 0 / 0.11));
+  --color-heyo-focus: light-dark(#18181b, #e4e4e7);
+
+  /* ---------------------------------------------------------------------
+   * Accent — monochrome, and deliberately so.
+   *
+   * The accent is simply the inverse of the page: near-black on light,
+   * near-white on dark. That leaves hue free to mean exactly one thing in this
+   * system — status. A blue primary button competes with a blue info banner for
+   * the same glance; an ink-coloured one never does.
+   *
+   * Anything filled with `brand` puts `text-heyo-inverse` on top, never a
+   * hard-coded white, or it disappears in dark mode.
+   * ------------------------------------------------------------------ */
+  --color-heyo-brand: light-dark(#18181b, #fafafa);
+  --color-heyo-brand-hover: light-dark(#000000, #ffffff);
+  /*
+   * Whatever sits on top of a brand fill — label text, a check mark, a radio
+   * dot. Lives in the `--color-*` namespace (unlike `text-heyo-inverse`) so it
+   * works as a background too.
+   */
+  --color-heyo-on-brand: light-dark(#fafafa, #18181b);
+  --color-heyo-brand-tint: light-dark(
+    oklch(0% 0 0 / 0.07),
+    oklch(100% 0 0 / 0.1)
+  );
+
+  /* ---------------------------------------------------------------------
+   * Status — solid for indicators, `-tint` for surfaces behind content
+   * ------------------------------------------------------------------ */
+  --color-heyo-info: light-dark(#2563eb, #5caaf6);
+  --color-heyo-info-tint: light-dark(
+    oklch(60% 0.19 258 / 0.1),
+    oklch(65% 0.16 255 / 0.16)
+  );
+  --color-heyo-success: light-dark(#16a34a, #35c264);
+  --color-heyo-success-tint: light-dark(
+    oklch(65% 0.16 155 / 0.12),
+    oklch(70% 0.15 154 / 0.14)
+  );
+  --color-heyo-warning: light-dark(#b37824, #db932e);
+  --color-heyo-warning-tint: light-dark(
+    oklch(75% 0.14 70 / 0.16),
+    oklch(75% 0.15 66 / 0.14)
+  );
+  /* Indicator red — dots, icons, rings. Bright enough to name the state. */
+  --color-heyo-danger: light-dark(#dc2626, #f7796d);
+  /* Fill red — carries white text, so it stays deep in both modes. */
+  --color-heyo-danger-solid: light-dark(#dc2626, #c44a4a);
+  --color-heyo-danger-solid-hover: light-dark(#b91c1c, #d15c55);
+  --color-heyo-danger-tint: light-dark(
+    oklch(63% 0.2 25 / 0.1),
+    oklch(67% 0.18 21 / 0.14)
+  );
+
+  /* ---------------------------------------------------------------------
+   * Text
+   * ------------------------------------------------------------------ */
+  --text-color-heyo-default: light-dark(#1a1a1e, #ededed);
+  --text-color-heyo-strong: light-dark(#09090b, #fafafa);
+  --text-color-heyo-subtle: light-dark(#71717a, #a1a1aa);
+  --text-color-heyo-inactive: light-dark(#a1a1aa, #52525b);
+  --text-color-heyo-placeholder: light-dark(#a1a1aa, #5c5c63);
+  --text-color-heyo-inverse: light-dark(#fafafa, #18181b);
+  --text-color-heyo-brand: light-dark(#09090b, #fafafa);
+  /* Links carry their affordance with an underline, not with hue. */
+  --text-color-heyo-link: light-dark(#09090b, #fafafa);
+  --text-color-heyo-info: light-dark(#1d4ed8, #7ba7f5);
+  --text-color-heyo-success: light-dark(#15803d, #6cd08a);
+  --text-color-heyo-warning: light-dark(#a16207, #d9a154);
+  --text-color-heyo-danger: light-dark(#b91c1c, #f7938a);
+
+  /* ---------------------------------------------------------------------
+   * Type scale — hierarchy comes from weight and colour, not size.
+   * Most of the interface sits on `base`.
+   * ------------------------------------------------------------------ */
+  --text-xs: 12px;
+  --text-xs--line-height: 1.3333;
+  --text-sm: 13px;
+  --text-sm--line-height: 1.5385;
+  --text-base: 14px;
+  --text-base--line-height: 1.5;
+  --text-lg: 16px;
+  --text-lg--line-height: 1.5;
+  --text-xl: 18px;
+  --text-xl--line-height: 1.4444;
+  --text-2xl: 22px;
+  --text-2xl--line-height: 1.2727;
+  --text-3xl: 28px;
+  --text-3xl--line-height: 1.2143;
+
+  /* ---------------------------------------------------------------------
+   * Radii — chip / control / card / window
+   * ------------------------------------------------------------------ */
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 10px;
+  --radius-2xl: 14px;
+
+  /* ---------------------------------------------------------------------
+   * Shadows
+   *
+   * Depth is a hairline plus a whisper of drop. In dark mode the hairline is
+   * translucent white — a grey border on a near-black surface reads as grime,
+   * a white one reads as an edge catching light.
+   * ------------------------------------------------------------------ */
+  --shadow-xs: 0 1px 1px light-dark(oklch(0% 0 0 / 0.04), oklch(0% 0 0 / 0.3));
+  --shadow-sm: 0 1px 2px light-dark(oklch(0% 0 0 / 0.06), oklch(0% 0 0 / 0.4));
+  --shadow-md:
+    0 2px 6px light-dark(oklch(0% 0 0 / 0.06), oklch(0% 0 0 / 0.35)),
+    0 1px 2px light-dark(oklch(0% 0 0 / 0.04), oklch(0% 0 0 / 0.3));
+  --shadow-lg:
+    0 8px 28px light-dark(oklch(0% 0 0 / 0.1), oklch(0% 0 0 / 0.55)),
+    0 2px 6px light-dark(oklch(0% 0 0 / 0.05), oklch(0% 0 0 / 0.4));
+
+  /*
+   * Pressed-in fill for text fields. Registered in the `--inset-shadow-*`
+   * namespace (not `--shadow-*`) so the `inset-shadow-field` utility composes
+   * with `ring-1` and `shadow-xs` instead of overwriting their box-shadow.
+   */
+  --inset-shadow-field: inset 0 1px 2px
+    light-dark(oklch(0% 0 0 / 0.05), oklch(0% 0 0 / 0.32));
+
+  /* ---------------------------------------------------------------------
+   * Fonts — preferences, not dependencies. If Inter or JetBrains Mono happen
+   * to be installed or self-hosted they get used; otherwise the system stack
+   * takes over and nothing is downloaded.
+   * ------------------------------------------------------------------ */
+  --font-sans:
+    "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  --font-mono:
+    "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas,
+    "Liberation Mono", monospace;
+
+  /* ---------------------------------------------------------------------
+   * Code
+   *
+   * The one part of the system that does NOT follow the colour mode. A code
+   * block is a quotation from a terminal, and terminals are dark — flipping it
+   * to a light card in light mode makes the snippet read as UI rather than as
+   * output, and forces a second palette to be tuned and maintained. Ink,
+   * near-black, always.
+   *
+   * Monochrome, on purpose. A rainbow of hues inside a snippet competes with
+   * the interface around it — status colours, links, badges — and is the first
+   * thing that breaks when someone retints the product. Grey separates the same
+   * constructs with the two axes that survive a screenshot, a colourblind eye
+   * and a black-and-white print: lightness (keywords brightest, punctuation
+   * dimmest) and style (comments italic, keywords a touch heavier).
+   * ------------------------------------------------------------------ */
+  --color-code-surface: #0c0c0e;
+  --color-code-bar: #141417;
+  --color-code-edge: oklch(100% 0 0 / 0.08);
+  --color-code-gutter: oklch(100% 0 0 / 0.26);
+  --color-code-highlight: oklch(100% 0 0 / 0.06);
+  --color-code-highlight-edge: oklch(100% 0 0 / 0.55);
+
+  /* A single neutral ramp. Ordered by how much a construct should pull the eye. */
+  --code-plain: oklch(84% 0 0);
+  --code-comment: oklch(50% 0 0);
+  --code-string: oklch(71% 0 0);
+  --code-number: oklch(88% 0 0);
+  --code-keyword: oklch(100% 0 0);
+  --code-builtin: oklch(92% 0 0);
+  --code-function: oklch(95% 0 0);
+  --code-property: oklch(77% 0 0);
+  --code-operator: oklch(66% 0 0);
+  --code-punctuation: oklch(56% 0 0);
+
+  /* ---------------------------------------------------------------------
+   * Motion
+   * ------------------------------------------------------------------ */
+  --ease-heyo: cubic-bezier(0.32, 0.72, 0, 1);
+  /*
+   * Stepped, not linear. The spinner glyph is eight discrete spokes, so it
+   * should tick from one to the next — a smooth rotation smears them.
+   */
+  --animate-heyo-spin: heyo-spin 0.8s steps(8, end) infinite;
+
+  @keyframes heyo-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Colour mode plumbing. `light-dark()` reads `color-scheme`, so this is the
+ * only switch in the whole system.
+ * ------------------------------------------------------------------------ */
+@layer base {
+  :root {
+    color-scheme: light dark;
+
+    /* Sidebar runtime variables (overridable per Sidebar.Provider) */
+    --heyo-sidebar-width: 15rem;
+    --heyo-sidebar-width-icon: 3.25rem;
+    --heyo-sidebar-duration: 200ms;
+  }
+
+  [data-mode="light"] {
+    color-scheme: light;
+  }
+
+  [data-mode="dark"] {
+    color-scheme: dark;
+  }
+
+  ::selection {
+    background-color: --alpha(var(--color-heyo-brand) / 25%);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Helpers the components rely on.
+ * ------------------------------------------------------------------------ */
+@utility heyo-placeholder {
+  &::placeholder {
+    color: var(--text-color-heyo-placeholder);
+  }
+}
+
+/*
+ * The keyboard focus ring.
+ *
+ * This is a real utility rather than `outline-none focus-visible:outline-2`
+ * because in Tailwind v4 `outline-none` pins `--tw-outline-style` to `none`,
+ * which the later `outline-2` then resolves to — silently killing the ring.
+ * Declaring the whole thing in one place also means every focusable element
+ * in the system is guaranteed to look identical.
+ */
+@utility heyo-focus {
+  /*
+   * A hairline, not a slab. Everything else in the system draws its edges with
+   * a 1px ring, so a 2px focus outline read as a different weight of border
+   * rather than as focus. The contrast does the work — the ring colour is the
+   * inverse of the page — and the 2px offset keeps it clear of the control's
+   * own edge instead of thickening it.
+   */
+  outline: 1px solid transparent;
+  outline-offset: 2px;
+
+  &:focus-visible {
+    outline-color: var(--color-heyo-focus);
+  }
+}
+
+/*
+ * Native overflow, styled.
+ *
+ * `ScrollArea` replaces the scrollbar with real elements and is the right tool
+ * when the surface is a designed one (a menu, a pane, a dialog body). This
+ * utility is for the cases where you just want the browser's own scrollbar to
+ * stop looking like 2003: a thin, translucent thumb with no track and no
+ * buttons, that darkens on hover. Firefox gets `scrollbar-width`, everything
+ * else gets the WebKit pseudo-elements.
+ */
+@utility heyo-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: light-dark(oklch(0% 0 0 / 0.22), oklch(100% 0 0 / 0.22))
+    transparent;
+
+  &::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: light-dark(oklch(0% 0 0 / 0.2), oklch(100% 0 0 / 0.2));
+    border: 3px solid transparent;
+    border-radius: 9999px;
+    background-clip: content-box;
+  }
+
+  &:hover::-webkit-scrollbar-thumb,
+  &::-webkit-scrollbar-thumb:hover {
+    background-color: light-dark(oklch(0% 0 0 / 0.34), oklch(100% 0 0 / 0.34));
+  }
+
+  &::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+}
