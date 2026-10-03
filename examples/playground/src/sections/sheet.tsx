@@ -8,7 +8,14 @@ import {
   Text,
   Textarea,
 } from "@heyo-sh/heyo-ui";
-import { DeviceFloppyIcon, ListIcon, MapPinIcon, PencilIcon } from "../icons";
+import {
+  DeviceFloppyIcon,
+  DotsIcon,
+  ListIcon,
+  MapPinIcon,
+  PencilIcon,
+  TrashIcon,
+} from "../icons";
 import { Example, Section } from "./section";
 
 export function SheetSection() {
@@ -72,6 +79,51 @@ export function SheetSection() {
               <Sheet.Close render={<Button variant="ghost">Cancel</Button>} />
               <Button variant="primary" icon={DeviceFloppyIcon}>
                 Save changes
+              </Button>
+            </Sheet.Footer>
+          </Sheet.Content>
+        </Sheet>
+      </Example>
+
+      <Example label='variant="inset" — the detail pane'>
+        <Sheet modal={false}>
+          <Sheet.Trigger
+            render={<Button variant="outline">Open a record</Button>}
+          />
+          <Sheet.Content variant="inset" size="sm">
+            <Sheet.Header
+              actions={
+                <Button
+                  variant="ghost"
+                  size="xs"
+                  shape="square"
+                  icon={DotsIcon}
+                  aria-label="Actions"
+                />
+              }
+            >
+              <Sheet.Title>mountain-ridge.png</Sheet.Title>
+              <Sheet.Description>1200×800 · 26 KB</Sheet.Description>
+            </Sheet.Header>
+            <Sheet.Body className="flex flex-col gap-4">
+              <Text size="sm" tone="subtle">
+                Nothing behind it is dimmed and the page still takes clicks, so
+                picking the next record is one press rather than close-then-
+                pick.
+              </Text>
+              <Input label="Filename" defaultValue="mountain-ridge.png" />
+              <Input label="Alternative text" placeholder="Describe it" />
+            </Sheet.Body>
+            <Sheet.Footer className="justify-between">
+              <Button
+                variant="destructive-secondary"
+                size="sm"
+                icon={TrashIcon}
+              >
+                Delete
+              </Button>
+              <Button variant="primary" size="sm">
+                Save
               </Button>
             </Sheet.Footer>
           </Sheet.Content>

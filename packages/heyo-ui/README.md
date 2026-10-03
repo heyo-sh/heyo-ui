@@ -95,7 +95,7 @@ That's the entire theming API. Components never branch on mode.
 | Forms      | `Input`, `Textarea`, `Select`, `Checkbox`, `Radio`, `Switch`, `Slider`, `Toggle`, `ToggleGroup`, `Field`, `Label` |
 | Actions    | `Button`, `ButtonGroup`, `Link`, `Dropdown`                                                                       |
 | Feedback   | `Banner`, `Badge`, `Spinner`, `Skeleton`, `Progress`, `Meter`, `Empty`, `Toaster` + `toast()`                     |
-| Overlays   | `Dialog`, `AlertDialog`, `ConfirmDialog`, `Popover`, `Tooltip`                                                    |
+| Overlays   | `Dialog`, `Sheet`, `Popover`, `Tooltip`, `Command`                                                                |
 | Navigation | `Tabs`, `Breadcrumb`, `Pagination`                                                                                |
 | Content    | `Text`, `Heading`, `Code`, `Kbd`, `Avatar`                                                                        |
 
@@ -237,6 +237,49 @@ Provider knobs: `defaultOpen`, `open` / `onOpenChange`, `width`, `widthIcon`,
 Sidebar knobs: `side` (`left` / `right`), `collapsible`
 (`icon` / `offcanvas` / `none`).
 
+### Sheet
+
+A panel that slides in from an edge. Two shapes, because "a side quest to the
+page" turns out to be two different jobs:
+
+```tsx
+// The wall: flush with the edge, scrim behind it, page locked.
+<Sheet>
+  <Sheet.Trigger render={<Button>Filters</Button>} />
+  <Sheet.Content side="right" size="lg">
+    <Sheet.Header>
+      <Sheet.Title>Filters</Sheet.Title>
+    </Sheet.Header>
+    <Sheet.Body>…</Sheet.Body>
+    <Sheet.Footer>
+      <Sheet.Close render={<Button variant="ghost">Cancel</Button>} />
+      <Button variant="primary">Apply</Button>
+    </Sheet.Footer>
+  </Sheet.Content>
+</Sheet>
+
+// The detail pane: floats off every edge, nothing dimmed, page still live.
+<Sheet open={!!selected} onOpenChange={close} modal={false}>
+  <Sheet.Content variant="inset" size="sm">
+    <Sheet.Header actions={<Button variant="ghost" size="xs" icon={DotsIcon} />}>
+      <Sheet.Title>{selected.filename}</Sheet.Title>
+      <Sheet.Description>1200×800 · 26 KB</Sheet.Description>
+    </Sheet.Header>
+    <Sheet.Body>…</Sheet.Body>
+  </Sheet.Content>
+</Sheet>
+```
+
+`variant="inset"` drops the scrim by default and pairs with `modal={false}`:
+the list behind stays clickable, so picking the next record is one press
+rather than close-then-pick. That pairing is the whole reason library screens
+kept hand-rolling a `Card` pinned to the right instead of reaching for this
+component. `backdrop` overrides the default either way.
+
+`Sheet.Header` takes an `actions` slot for controls that belong to the panel
+rather than to its content — a status chip, an overflow menu — laid out on the
+title's row, before the close button.
+
 ### The rest, briefly
 
 ```tsx
@@ -338,19 +381,33 @@ await toast.promise(deploy(), {
 
 ## Confirmations
 
+There is no `ConfirmDialog`, because there is nothing for one to add: a
+confirmation is a `Dialog` with two buttons in its footer, and the thing that
+makes it feel solid is spelling out what will happen rather than importing a
+different component.
+
 ```tsx
-<ConfirmDialog
-  destructive
-  title="Delete acme-api?"
-  description="This cannot be undone."
-  confirmLabel="Delete forever"
-  onResolve={async (ok) => ok && (await remove())}
-  trigger={<Button variant="destructive-secondary">Delete</Button>}
-/>
+<Dialog open={open} onOpenChange={setOpen} dismissible={!busy}>
+  <Dialog.Content size="sm">
+    <Dialog.Header>
+      <Dialog.Title>Delete acme-api?</Dialog.Title>
+      <Dialog.Description>
+        Three deployments and their logs go with it. This cannot be undone.
+      </Dialog.Description>
+    </Dialog.Header>
+    <Dialog.Footer>
+      <Dialog.Close render={<Button variant="ghost">Cancel</Button>} />
+      <Button variant="destructive" loading={busy} onClick={remove}>
+        Delete forever
+      </Button>
+    </Dialog.Footer>
+  </Dialog.Content>
+</Dialog>
 ```
 
-`onResolve` may return a promise — the confirm button spins and the dialog
-stays up until it settles, so a slow delete never looks like a no-op.
+Keep the confirm button `loading` until the request settles and the dialog
+open behind it — a slow delete that closes immediately looks like a no-op, and
+the error has nowhere to land.
 
 ## Tokens
 
@@ -486,8 +543,9 @@ pull request is reviewed against.
    with `@tabler/icons-react`.
 9. **Nothing locks the page unless it's a modal task.** `Dropdown` and `Select`
    default to `modal={false}` — unlike Base UI — because a menu is a list of
-   things you might not do, and freezing the page behind one feels broken. Only
-   `Dialog` and `Sheet` lock scroll, because only they demand an answer.
+   things you might not do, and freezing the page behind one feels broken.
+   `Dialog` and a flush `Sheet` lock scroll, because they demand an answer; an
+   inset `Sheet` is a detail pane and does not.
 10. **One component per job.** There is one `Dialog` (not dialog + alert dialog
     - confirm dialog), one bar (`Meter`, not meter + progress), one avatar
       radius. A second component that differs by a prop is a prop.
