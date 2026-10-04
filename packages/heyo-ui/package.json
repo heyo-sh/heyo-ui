@@ -1,6 +1,6 @@
 {
   "name": "@heyo-sh/heyo-ui",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "heyo-ui \u2014 a small, flat, developer-first React component library. Semantic tokens, hairline rings, no dark: variants.",
   "license": "MIT",
   "type": "module",
