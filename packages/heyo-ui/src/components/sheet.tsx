@@ -4,6 +4,7 @@ import { Dialog as DialogPrimitive } from "@base-ui/react/dialog";
 import type { ComponentProps, ReactNode } from "react";
 import { cn } from "../lib/cn";
 import { XIcon } from "../lib/icons";
+import { zOverlay } from "../lib/surface";
 
 /**
  * A panel that slides in from an edge — almost always the right one.
@@ -141,7 +142,8 @@ function SheetContent({
         <DialogPrimitive.Backdrop
           data-slot="sheet-backdrop"
           className={cn(
-            "fixed inset-0 z-50 bg-heyo-scrim backdrop-blur-[1px]",
+            "fixed inset-0 bg-heyo-scrim backdrop-blur-[1px]",
+            zOverlay,
             "transition-opacity duration-200 ease-heyo",
             "data-starting-style:opacity-0 data-ending-style:opacity-0",
           )}
@@ -152,7 +154,8 @@ function SheetContent({
         data-side={side}
         data-variant={variant}
         className={cn(
-          "fixed z-50 flex flex-col overflow-hidden",
+          "fixed flex flex-col overflow-hidden",
+          zOverlay,
           "bg-heyo-base text-heyo-default outline-none",
           "transition-[opacity,transform] duration-250 ease-heyo motion-reduce:transition-none",
           "data-starting-style:opacity-0 data-ending-style:opacity-0",

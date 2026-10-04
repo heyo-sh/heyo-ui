@@ -286,7 +286,7 @@ title's row, before the close button.
 <Badge dot variant="success">Healthy</Badge>
 <Banner variant="warning" title="Quota almost reached" onDismiss={fn}>…</Banner>
 
-<Select defaultValue="fra">
+<Select defaultValue="fra" label="Region" description="Where the worker runs.">
   <Select.Trigger placeholder="Pick a region" />
   <Select.Content>
     <Select.Group>
@@ -323,6 +323,11 @@ Groups rule themselves off and their labels stick while you scroll. The popup
 caps at `18rem` (override with `maxHeight`) or the available space, whichever
 is smaller, and scrolls past that.
 
+`Select` takes the same field props as `Input` — `label`, `description`,
+`error`, `optional`, `labelAside` — so a labelled select is one prop rather
+than a hand-built `<label>` over a trigger, and the gap under the label is the
+same 6px every other control uses. Omit them for the bare control.
+
 `Tabs` takes three variants:
 
 | `variant`        | Shape                                                                                       |
@@ -334,6 +339,24 @@ is smaller, and scrolls past that.
 `Tooltip` opens instantly and takes `side` (`top` / `right` / `bottom` / `left`),
 `align` and `arrow`. No provider needed — add `Tooltip.Provider` only if you
 want a shared delay.
+
+### What floats over what
+
+Three layers, and they are not negotiable per component:
+
+| Layer    | Who                                                    |
+| -------- | ------------------------------------------------------ |
+| `z-50`   | `Dialog`, `Sheet`, `Command`                           |
+| `z-[60]` | `Select`, `Dropdown`, `Popover`, `Combobox`, `Toaster` |
+| `z-[70]` | `Tooltip`                                              |
+
+The index sits on the **positioner**, not on the popup. A menu opened inside a
+dialog is portalled into the dialog's own portal node and positioned with a
+`transform`, which makes the positioner a stacking context — a `z-50` on the
+popup inside it is then scoped to that context and loses to the dialog. That
+is why a select used to open _underneath_ the dialog that owned it, and why a
+tooltip could end up behind a menu. A toast clears the dialog it reports on,
+and nothing covers a tooltip.
 
 ## Shorthands
 
@@ -549,6 +572,13 @@ pull request is reviewed against.
 10. **One component per job.** There is one `Dialog` (not dialog + alert dialog
     - confirm dialog), one bar (`Meter`, not meter + progress), one avatar
       radius. A second component that differs by a prop is a prop.
+11. **An affordance is a promise.** A row only lights up on hover if there is
+    something to click: `Table.Row` drops the tint, the leading marker and the
+    pointer for `placeholder` rows _and_ for any row whose cell spans the
+    table, which is what an empty state or a "load more" strip looks like.
+    Conversely, a row with `onClick` is focusable and answers Enter — the
+    whole row is the target, not the link somebody remembered to put in the
+    first cell.
 
 ## Deliberate non-features
 

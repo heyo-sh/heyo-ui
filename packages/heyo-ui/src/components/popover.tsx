@@ -4,7 +4,7 @@ import { Popover as PopoverPrimitive } from "@base-ui/react/popover";
 import type { ReactNode } from "react";
 import { cn } from "../lib/cn";
 import { XIcon } from "../lib/icons";
-import { popupMotion, popupSurface } from "../lib/surface";
+import { popupMotion, popupSurface, withLayer, zPopup } from "../lib/surface";
 
 export interface PopoverContentProps extends Omit<
   PopoverPrimitive.Popup.Props,
@@ -41,6 +41,7 @@ function PopoverContent({
         align={align}
         sideOffset={sideOffset}
         {...positioner}
+        className={withLayer(zPopup, positioner?.className)}
       >
         <PopoverPrimitive.Popup
           data-slot="popover"

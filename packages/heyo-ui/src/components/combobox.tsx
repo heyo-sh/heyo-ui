@@ -11,7 +11,7 @@ import {
 } from "../lib/control";
 import { renderIcon, type IconLike } from "../lib/icon-slot";
 import { CheckIcon, ChevronUpDownIcon, XIcon } from "../lib/icons";
-import { popupItem, popupMotion, popupSurface } from "../lib/surface";
+import { popupItem, popupMotion, popupSurface, zPopup } from "../lib/surface";
 
 export interface ComboboxOption {
   value: string;
@@ -82,7 +82,7 @@ function ComboboxList({
 
   return (
     <ComboboxPrimitive.Portal>
-      <ComboboxPrimitive.Positioner sideOffset={4}>
+      <ComboboxPrimitive.Positioner sideOffset={4} className={zPopup}>
         <ComboboxPrimitive.Popup
           data-slot="combobox-popup"
           className={cn(popupSurface, popupMotion, "w-(--anchor-width)")}

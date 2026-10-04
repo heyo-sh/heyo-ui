@@ -10,6 +10,7 @@ import {
   WarningIcon,
   XIcon,
 } from "../lib/icons";
+import { zPopup } from "../lib/surface";
 
 /**
  * A module-level manager, so toasts can be fired from anywhere — event
@@ -191,7 +192,11 @@ export function Toaster({
           data-slot="toaster"
           data-position={position}
           className={cn(
-            "fixed z-50 w-80 max-w-[calc(100vw-2rem)] outline-none",
+            // Above dialogs, not level with them: a toast is usually the
+            // answer to something done inside one, and an answer hidden
+            // behind the question is no answer at all.
+            "fixed w-80 max-w-[calc(100vw-2rem)] outline-none",
+            zPopup,
             positions[position],
           )}
         >

@@ -3,7 +3,7 @@
 import { Tooltip as TooltipPrimitive } from "@base-ui/react/tooltip";
 import { createContext, useContext, type ReactNode } from "react";
 import { cn } from "../lib/cn";
-import { popupMotion } from "../lib/surface";
+import { popupMotion, zTooltip } from "../lib/surface";
 
 export type TooltipSide = "top" | "right" | "bottom" | "left";
 export type TooltipAlign = "start" | "center" | "end";
@@ -93,11 +93,17 @@ function TooltipRoot({
             align={align}
             sideOffset={sideOffset}
             alignOffset={alignOffset}
+            // On the positioner, and the highest layer there is: a tooltip
+            // explains whatever is on top, so nothing may cover it — not a
+            // dialog it was opened from, not the menu it is anchored inside.
+            // (The popup below is inside the positioner's stacking context,
+            // so a z-index there would only order it against its siblings.)
+            className={zTooltip}
           >
             <TooltipPrimitive.Popup
               data-slot="tooltip"
               className={cn(
-                "z-50 max-w-64 origin-(--transform-origin) rounded-md px-2 py-1",
+                "max-w-64 origin-(--transform-origin) rounded-md px-2 py-1",
                 "bg-heyo-contrast text-xs leading-4 text-heyo-inverse",
                 "shadow-md select-none",
                 popupMotion,

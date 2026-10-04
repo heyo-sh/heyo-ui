@@ -5,12 +5,14 @@ import {
   Checkbox,
   Code,
   CopyButton,
+  Empty,
   Table,
   Text,
+  toast,
   useSelection,
 } from "@heyo-sh/heyo-ui";
 import { useMemo, useState } from "react";
-import { TrashIcon } from "../icons";
+import { CubeIcon, TrashIcon } from "../icons";
 import { Section, Stack } from "./section";
 
 const deployments = [
@@ -98,6 +100,55 @@ export function TableSection() {
             ))}
           </Table.Body>
         </Table>
+      </Stack>
+
+      <Stack label="clickable rows + an empty state that isn't one">
+        <Table>
+          <Table.Head>
+            <Table.Row>
+              <Table.Header>Commit</Table.Header>
+              <Table.Header>Branch</Table.Header>
+              <Table.Header align="end">Duration</Table.Header>
+            </Table.Row>
+          </Table.Head>
+          <Table.Body>
+            {deployments.slice(0, 2).map(({ sha, branch, time }) => (
+              <Table.Row
+                key={sha}
+                onClick={() => toast(`Opened ${sha}`)}
+                aria-label={`Open ${sha}`}
+              >
+                <Table.Cell primary>
+                  <Code>{sha}</Code>
+                </Table.Cell>
+                <Table.Cell className="font-mono text-xs text-heyo-subtle">
+                  {branch}
+                </Table.Cell>
+                <Table.Cell numeric className="text-heyo-subtle">
+                  {time}
+                </Table.Cell>
+              </Table.Row>
+            ))}
+            {/* No `placeholder` on purpose: a cell spanning the table is
+                enough for the row to lose the tint, the marker and the
+                pointer, because forgetting the flag is how empty states keep
+                ending up looking clickable. */}
+            <Table.Row>
+              <Table.Cell colSpan={3} className="h-auto p-0">
+                <Empty
+                  icon={CubeIcon}
+                  title="No more deployments"
+                  description="Push to main and the next one shows up here."
+                  className="m-4"
+                />
+              </Table.Cell>
+            </Table.Row>
+          </Table.Body>
+        </Table>
+        <Text size="sm" tone="subtle">
+          The two real rows answer Enter as well as a click — the row is the
+          target, not a link inside it.
+        </Text>
       </Stack>
 
       <Stack label="sortable + numeric">
