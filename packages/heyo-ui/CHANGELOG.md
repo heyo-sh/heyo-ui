@@ -1,5 +1,76 @@
 # @heyo-sh/heyo-ui
 
+## 0.3.0
+
+### Minor Changes
+
+- 5f1e0f2: `Sheet` gains the detail-pane shape it was missing.
+
+  A sheet used to be one thing: a wall flush with the viewport edge, with a
+  scrim behind it and the page locked. That is right for a task you have to
+  finish — filters, a create form — and wrong for the other half of what side
+  panels are for: pick a row, read it, pick the next row. Every library screen
+  that needed the second one hand-rolled a `Card` pinned to the right instead,
+  which is how you end up with four different detail panes in one product.
+
+  - **`variant="inset"`** floats the panel off every edge with a radius, a ring
+    and a shadow, and drops the scrim by default. Paired with `modal={false}`
+    the list behind stays live, so choosing the next record is one press rather
+    than close-then-pick. Its exit is a short slide plus a fade rather than a
+    full-width sweep — a framed panel that flies off screen reads as a mistake.
+  - **`backdrop`** overrides the per-variant default in either direction, for an
+    inset panel that still wants to dim the page.
+  - **`Sheet.Header` takes `actions`**: controls that belong to the panel rather
+    than to its content — a status chip, an overflow menu — laid out on the
+    title's row, before the close button, so the header stays one line deep.
+    `Sheet.Title` truncates, because a filename is a title now.
+
+  Nothing changes for existing sheets: `variant` defaults to `flush`, which is
+  the current geometry, motion and scrim exactly.
+
+- ffa1de7: Calendar, Skeleton, ScrollArea and Table fixes.
+
+  - **`Calendar` is laid out on a fixed 2rem cell** instead of stretching to its
+    container. Weekday headers now line up with the numbers under them, a selected
+    range fills edge to edge rather than leaving a gap between every day, and with
+    `months={2}` each heading sits over its own grid. Today's dot is centred
+    explicitly, weekday abbreviations drop the locale's trailing punctuation
+    (`pon.` → `po`), and the month grid is computed once per render instead of
+    once per week row.
+  - **`Skeleton` sweeps instead of pulsing.** A page of pulsing rectangles all
+    breathe at once; a single faint highlight travelling through one block reads
+    as "filling in" and is far quieter. New `delay` prop (and the
+    `--heyo-skeleton-delay` custom property) staggers a group — `lines` and
+    `DataTable`'s loading rows do it for you. Respects
+    `prefers-reduced-motion`.
+  - **`ScrollArea` no longer stretches its parent** when `orientation` includes
+    the horizontal axis, and `fade` now works on that axis too. The two edge masks
+    are composited, so `orientation="both"` fades all four edges instead of only
+    the last axis declared.
+  - **`Table.Row` gained `placeholder`.** A row that is not a record — an empty
+    state, a "load more" strip — gets no hover tint, no leading marker, no zebra
+    stripe and no pointer. `DataTable` uses it for both empty states, which
+    previously highlighted "Nothing here yet" as though it were clickable.
+
+### Patch Changes
+
+- e1c99b1: `icon` props accept `forwardRef` and `memo` components again.
+
+  Every `icon` prop in the library promises three shapes: a component, an
+  element, or any node. `renderIcon` only recognised the first one when it was a
+  plain function — but `@tabler/icons-react`, `lucide-react` and `react-icons`
+  all produce `forwardRef` components, which are _objects_
+  (`{ $$typeof, render }`), not functions.
+
+  They fell through to the "render it as-is" branch, where React was handed a
+  component object as a child and threw `Objects are not valid as a React child
+(found: object with keys {$$typeof, render})`. Since Tabler is the icon set
+  the documentation recommends, `<Button icon={IconPlus} />` — the first example
+  in the README — crashed.
+
+  `renderIcon` now treats `forwardRef` and `memo` objects as component types,
+  which is what they are.
+
 ## 0.2.0
 
 ### Minor Changes
