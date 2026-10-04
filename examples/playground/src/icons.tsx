@@ -184,6 +184,15 @@ export const CopyIcon = (p: SVGProps<SVGSVGElement>) => (
   </Icon>
 );
 
+/** tabler: dots */
+export const DotsIcon = (p: SVGProps<SVGSVGElement>) => (
+  <Icon {...p}>
+    <path d="M5 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" />
+    <path d="M12 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" />
+    <path d="M19 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" />
+  </Icon>
+);
+
 /** tabler: trash */
 export const TrashIcon = (p: SVGProps<SVGSVGElement>) => (
   <Icon {...p}>
