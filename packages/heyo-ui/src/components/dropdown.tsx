@@ -4,7 +4,13 @@ import { Menu } from "@base-ui/react/menu";
 import { cn } from "../lib/cn";
 import { renderIcon, type IconLike } from "../lib/icon-slot";
 import { CheckIcon, ChevronRightIcon } from "../lib/icons";
-import { popupItem, popupMotion, popupSurface } from "../lib/surface";
+import {
+  popupItem,
+  popupMotion,
+  popupSurface,
+  withLayer,
+  zPopup,
+} from "../lib/surface";
 
 export interface DropdownProps extends Menu.Root.Props {
   /**
@@ -91,6 +97,7 @@ function DropdownContent({
         align={align}
         sideOffset={sideOffset}
         {...positioner}
+        className={withLayer(zPopup, positioner?.className)}
       >
         <Menu.Popup
           data-slot="dropdown"

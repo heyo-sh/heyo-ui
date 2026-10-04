@@ -9,12 +9,17 @@ import {
   type ControlSize,
 } from "../lib/control";
 import { CheckIcon, ChevronUpDownIcon } from "../lib/icons";
-import { popupItem, popupMotion, popupSurface } from "../lib/surface";
+import {
+  popupItem,
+  popupMotion,
+  popupSurface,
+  withLayer,
+  zPopup,
+} from "../lib/surface";
+import { Field, type FieldOwnProps } from "./field";
 
-export interface SelectProps<
-  Value,
-  Multiple extends boolean | undefined,
-> extends SelectPrimitive.Root.Props<Value, Multiple> {
+export interface SelectProps<Value, Multiple extends boolean | undefined>
+  extends SelectPrimitive.Root.Props<Value, Multiple>, FieldOwnProps {
   /**
    * Whether the open list locks the page.
    *
@@ -25,13 +30,47 @@ export interface SelectProps<
    * @default false
    */
   modal?: boolean;
+  /** Class for the outer field wrapper (only when a label/description/error is used). */
+  fieldClassName?: string;
 }
 
+/**
+ * Pass `label` (or `description` / `error`) and the select gets the same field
+ * layout `Input` does — same 6px gap under the label, same error type, same
+ * wiring. Without them it is the bare control, and the caller lays it out.
+ *
+ * It is on the root rather than on the trigger because the label belongs to
+ * the *value*, and the trigger is only how you change it.
+ */
 function SelectRoot<Value, Multiple extends boolean | undefined = false>({
   modal = false,
+  label,
+  description,
+  error,
+  optional,
+  labelAside,
+  fieldClassName,
   ...props
 }: SelectProps<Value, Multiple>) {
-  return <SelectPrimitive.Root modal={modal} {...props} />;
+  const select = <SelectPrimitive.Root modal={modal} {...props} />;
+
+  const hasField =
+    label !== undefined || description !== undefined || error !== undefined;
+  if (!hasField) return select;
+
+  return (
+    <Field
+      className={fieldClassName}
+      label={label}
+      description={description}
+      error={error}
+      optional={optional}
+      labelAside={labelAside}
+      disabled={props.disabled}
+    >
+      {select}
+    </Field>
+  );
 }
 
 export interface SelectTriggerProps extends SelectPrimitive.Trigger.Props {
@@ -109,6 +148,9 @@ function SelectContent({
         sideOffset={sideOffset}
         alignItemWithTrigger={false}
         {...positioner}
+        // The layer belongs on the positioner: it is the transformed element,
+        // so it is the stacking context a popup inside a dialog competes in.
+        className={withLayer(zPopup, positioner?.className)}
       >
         <SelectPrimitive.Popup
           data-slot="select-content"

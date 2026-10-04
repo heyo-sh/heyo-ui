@@ -13,7 +13,7 @@ import {
 import { cn } from "../lib/cn";
 import { renderIcon, type IconLike } from "../lib/icon-slot";
 import { EnterIcon, SearchIcon, SpinnerIcon } from "../lib/icons";
-import { popupItem } from "../lib/surface";
+import { popupItem, zOverlay } from "../lib/surface";
 import { Kbd } from "./kbd";
 
 export interface CommandItem {
@@ -222,7 +222,8 @@ export function Command({
         <DialogPrimitive.Backdrop
           data-slot="command-backdrop"
           className={cn(
-            "fixed inset-0 z-50 bg-heyo-scrim backdrop-blur-[1px]",
+            "fixed inset-0 bg-heyo-scrim backdrop-blur-[1px]",
+            zOverlay,
             "transition-opacity duration-150 ease-heyo",
             "data-starting-style:opacity-0 data-ending-style:opacity-0",
           )}
@@ -244,7 +245,8 @@ export function Command({
           // around as results come and go. Pinned near the top it grows
           // downward, into space the eye is already resting on.
           className={cn(
-            "fixed top-[12vh] left-1/2 z-50 -translate-x-1/2",
+            "fixed top-[12vh] left-1/2 -translate-x-1/2",
+            zOverlay,
             "flex max-h-[min(30rem,70svh)] w-[calc(100vw-2rem)] max-w-xl flex-col overflow-hidden",
             "rounded-2xl bg-heyo-base text-heyo-default shadow-lg ring-1 ring-heyo-line outline-none",
             "transition-[opacity,transform] duration-150 ease-heyo",

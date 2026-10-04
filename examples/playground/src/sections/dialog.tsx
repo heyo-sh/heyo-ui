@@ -1,4 +1,14 @@
-import { Button, Checkbox, Dialog, Input, Text, toast } from "@heyo-sh/heyo-ui";
+import {
+  Button,
+  Checkbox,
+  Dialog,
+  Dropdown,
+  Input,
+  Select,
+  Text,
+  Tooltip,
+  toast,
+} from "@heyo-sh/heyo-ui";
 import { useState } from "react";
 import {
   DeviceFloppyIcon,
@@ -41,6 +51,58 @@ export function DialogSection() {
         <Text size="sm" tone="subtle">
           Escape, the backdrop and the ✕ all close it.
         </Text>
+      </Example>
+
+      {/* The regression this example exists for: a popup opened inside a
+          dialog is portalled into the dialog's own portal node, so without a
+          layer on the positioner it opens *underneath* the dialog. */}
+      <Example label="popups inside it">
+        <Dialog>
+          <Dialog.Trigger
+            render={<Button variant="outline">Invite an editor</Button>}
+          />
+          <Dialog.Content>
+            <Dialog.Header>
+              <Dialog.Title>Invite an editor</Dialog.Title>
+              <Dialog.Description>
+                The select, the menu and the tooltip all open over the dialog,
+                not behind it.
+              </Dialog.Description>
+            </Dialog.Header>
+            <Dialog.Body className="flex flex-col gap-4">
+              <Input label="Email" placeholder="you@example.com" />
+              <Select defaultValue="editor" label="Role">
+                <Select.Trigger />
+                <Select.Content
+                  items={[
+                    { value: "admin", label: "Admin" },
+                    { value: "editor", label: "Editor" },
+                    { value: "viewer", label: "Viewer" },
+                  ]}
+                />
+              </Select>
+              <div className="flex items-center gap-2">
+                <Dropdown>
+                  <Dropdown.Trigger
+                    render={<Button variant="outline">Permissions</Button>}
+                  />
+                  <Dropdown.Content
+                    items={[{ label: "Publish" }, { label: "Delete" }]}
+                  />
+                </Dropdown>
+                <Tooltip content="Nothing covers a tooltip.">
+                  <Button variant="ghost">Hover me</Button>
+                </Tooltip>
+              </div>
+            </Dialog.Body>
+            <Dialog.Footer>
+              <Dialog.Close render={<Button variant="ghost">Cancel</Button>} />
+              <Button variant="primary" icon={UserPlusIcon}>
+                Send invite
+              </Button>
+            </Dialog.Footer>
+          </Dialog.Content>
+        </Dialog>
       </Example>
 
       <Example label="confirm (it's just a dialog with two buttons)">

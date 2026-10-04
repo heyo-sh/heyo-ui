@@ -4,6 +4,7 @@ import { Dialog as DialogPrimitive } from "@base-ui/react/dialog";
 import type { ComponentProps } from "react";
 import { cn } from "../lib/cn";
 import { XIcon } from "../lib/icons";
+import { zOverlay } from "../lib/surface";
 
 const widths = {
   sm: "max-w-sm",
@@ -88,7 +89,8 @@ function DialogContent({
       <DialogPrimitive.Backdrop
         data-slot="dialog-backdrop"
         className={cn(
-          "fixed inset-0 z-50 bg-heyo-scrim backdrop-blur-[1px]",
+          "fixed inset-0 bg-heyo-scrim backdrop-blur-[1px]",
+          zOverlay,
           "transition-opacity duration-150 ease-heyo",
           "data-starting-style:opacity-0 data-ending-style:opacity-0",
         )}
@@ -96,7 +98,8 @@ function DialogContent({
       <DialogPrimitive.Popup
         data-slot="dialog"
         className={cn(
-          "fixed top-1/2 left-1/2 z-50 -translate-x-1/2 -translate-y-1/2",
+          "fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2",
+          zOverlay,
           "flex max-h-[85svh] w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-2xl",
           "bg-heyo-base text-heyo-default shadow-lg ring-1 ring-heyo-line outline-none",
           "transition-[opacity,transform] duration-150 ease-heyo",

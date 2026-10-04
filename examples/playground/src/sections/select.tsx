@@ -79,6 +79,25 @@ export function SelectSection() {
         </Select>
       </Example>
 
+      <Example
+        label="label / description / error"
+        className="max-w-xs flex-col items-stretch gap-4"
+      >
+        <Select items={regionLabels} defaultValue="fra" label="Region">
+          <Select.Trigger placeholder="Pick a region" />
+          <Select.Content items={regionGroups} />
+        </Select>
+        <Select
+          items={regionLabels}
+          label="Region"
+          description="Where the worker runs."
+          error="Pick one before deploying."
+        >
+          <Select.Trigger placeholder="Pick a region" />
+          <Select.Content items={regionGroups} />
+        </Select>
+      </Example>
+
       <Example label="items shorthand (grouped)" className="max-w-xs">
         <Select items={regionLabels}>
           <Select.Trigger placeholder="Pick a region" />

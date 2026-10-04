@@ -1,6 +1,6 @@
 "use client";
 
-import type { ComponentProps } from "react";
+import type { ComponentProps, MouseEvent } from "react";
 import { cn } from "../lib/cn";
 
 export interface TableProps extends ComponentProps<"table"> {
@@ -63,10 +63,12 @@ function TableRoot({
             // scrolls away with the cell it's drawn on in Safari.
             "[&_thead]:shadow-[0_1px_0_var(--color-heyo-hairline)]",
           ],
-          // `:not([data-placeholder])` on both: an empty state or a "load
-          // more" strip is not a record, so it is neither striped nor clickable.
-          "[&[data-striped]_tbody_tr:nth-child(even):not([data-placeholder])]:bg-heyo-elevated",
-          "[&[data-interactive]_tbody_tr:not([data-placeholder])]:cursor-pointer",
+          // Neither striped nor clickable: an empty state or a "load more"
+          // strip is not a record. `[data-placeholder]` says so explicitly;
+          // `:has(> td[colspan])` catches the rest, because a cell spanning
+          // the table is never one row of data — see `TableRow`.
+          "[&[data-striped]_tbody_tr:nth-child(even):not([data-placeholder]):not(:has(>td[colspan]))]:bg-heyo-elevated",
+          "[&[data-interactive]_tbody_tr:not([data-placeholder]):not(:has(>td[colspan]))]:cursor-pointer",
           className,
         )}
         {...props}
@@ -117,22 +119,52 @@ function TableRow({
   className,
   selected,
   placeholder,
+  onClick,
+  onKeyDown,
+  tabIndex,
   ...props
 }: TableRowProps) {
+  // A row you can click is a row you can reach: the pointer target is the
+  // whole row, so the keyboard one has to be too. Without this the only way
+  // in is whatever link somebody remembered to put in the first cell, which
+  // is exactly the design this replaces.
+  const clickable = Boolean(onClick) && !placeholder;
+
   return (
     <tr
       data-slot="table-row"
       data-selected={selected ? "" : undefined}
       data-placeholder={placeholder ? "" : undefined}
+      data-clickable={clickable ? "" : undefined}
       aria-selected={selected}
+      tabIndex={tabIndex ?? (clickable ? 0 : undefined)}
+      onClick={onClick}
+      onKeyDown={(event) => {
+        onKeyDown?.(event);
+        if (!clickable || event.defaultPrevented) return;
+        // Enter only. Space scrolls the page, and a table is the one place
+        // where losing your scroll position really costs you.
+        if (event.key !== "Enter" || event.target !== event.currentTarget) {
+          return;
+        }
+        event.preventDefault();
+        onClick?.(event as unknown as MouseEvent<HTMLTableRowElement>);
+      }}
       className={cn(
         "group/row relative transition-colors duration-75",
         // Hover is a scanning aid, not an affordance — it's on for every body
         // row, clickable or not. The leading marker lives on the first cell
         // (see `TableCell`), because a pseudo-element on a `<tr>` cannot be
         // positioned reliably across browsers.
-        "[tbody_&]:not-data-placeholder:hover:bg-heyo-tint",
+        //
+        // Two exclusions, because `placeholder` kept being forgotten and the
+        // "No pages yet" panel kept lighting up under the cursor: the flag,
+        // and a row whose cell spans columns. One `<td colspan>` across the
+        // table is an empty state, a loading strip or a group heading — never
+        // a record — so it loses the tint whether or not anybody said so.
+        "[tbody_&:not([data-placeholder]):not(:has(>td[colspan]))]:hover:bg-heyo-tint",
         "data-selected:bg-heyo-brand-tint data-selected:hover:bg-heyo-brand-tint",
+        clickable && "cursor-pointer heyo-focus",
         className,
       )}
       {...props}
@@ -293,8 +325,11 @@ function TableCell({
         "first:before:transition-transform first:before:duration-100 first:before:ease-heyo",
         "group-hover/row:first:before:scale-y-100",
         "group-data-[selected]/row:first:before:scale-y-100",
-        // A placeholder row has no marker at all — see `TableRow`.
+        // A placeholder row has no marker at all — see `TableRow`. Nor has a
+        // cell that spans the table: the marker would run down the side of an
+        // empty state.
         "group-data-[placeholder]/row:first:before:hidden",
+        "[&[colspan]]:before:hidden",
         alignClass[align ?? (numeric ? "end" : "start")],
         numeric && "tabular-nums",
         primary && "font-medium text-heyo-strong",
