@@ -124,6 +124,8 @@ export type SelectOption =
     };
 
 export interface SelectContentProps extends SelectPrimitive.Popup.Props {
+  /** Which edge of the trigger the popup is pinned to. */
+  align?: SelectPrimitive.Positioner.Props["align"];
   sideOffset?: number;
   /** Cap on the popup height. Anything taller scrolls. */
   maxHeight?: string;
@@ -135,6 +137,7 @@ export interface SelectContentProps extends SelectPrimitive.Popup.Props {
 
 function SelectContent({
   className,
+  align = "start",
   sideOffset = 4,
   maxHeight = "18rem",
   items,
@@ -145,6 +148,17 @@ function SelectContent({
   return (
     <SelectPrimitive.Portal>
       <SelectPrimitive.Positioner
+        // Pinned to the trigger's start edge, like every other popup here
+        // (`Dropdown` aligns to `start`, `Combobox` takes the anchor's width
+        // outright). Base UI centres by default, which ties the popup's
+        // position to its width: a list long enough to scroll is a list whose
+        // scrollbar widens the popup — the gutter counts towards the
+        // shrink-to-fit width — and a centred popup answers that by sliding
+        // sideways by half the scrollbar. The list jumping a few pixels the
+        // moment it becomes scrollable is the bug; an edge that stays put is
+        // the fix, and it also stops a popup wider than its trigger from
+        // hanging off both sides of the control it belongs to.
+        align={align}
         sideOffset={sideOffset}
         alignItemWithTrigger={false}
         {...positioner}

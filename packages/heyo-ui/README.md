@@ -323,6 +323,13 @@ Groups rule themselves off and their labels stick while you scroll. The popup
 caps at `18rem` (override with `maxHeight`) or the available space, whichever
 is smaller, and scrolls past that.
 
+It opens pinned to the trigger's start edge (`align`, `"start"` by default, and
+`"center"` or `"end"` if you want them). An edge is anchored rather than the
+centre because a popup's width is not fixed: an option longer than the trigger
+widens it, and so does the scrollbar on a list long enough to scroll, since the
+gutter counts towards the popup's shrink-to-fit width. Centred, every one of
+those changes slides the whole list sideways by half of itself.
+
 `Select` takes the same field props as `Input` — `label`, `description`,
 `error`, `optional`, `labelAside` — so a labelled select is one prop rather
 than a hand-built `<label>` over a trigger, and the gap under the label is the
