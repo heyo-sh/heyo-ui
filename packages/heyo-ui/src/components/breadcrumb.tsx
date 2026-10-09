@@ -101,7 +101,7 @@ function CrumbLink({ item }: { item: Crumb }) {
     props: {
       href: item.href,
       className: cn(
-        "flex min-w-0 items-center gap-1.5 rounded-xs text-heyo-subtle no-underline",
+        "flex min-w-0 cursor-pointer items-center gap-1.5 rounded-xs text-heyo-subtle no-underline",
         "transition-colors hover:text-heyo-default heyo-focus",
       ),
       children: (
