@@ -200,8 +200,14 @@ export function DataTable<Row>({
 
   const columnCount =
     visibleColumns.length + (selectable ? 1 : 0) + (actionColumn ? 1 : 0);
+  // The toolbar strip is for *controls*, so only controls bring it into
+  // existence. `title` and `description` draw their own block above it and
+  // used to count here too, which left a 3.25rem bar with a rule under it and
+  // nothing in it on every table that is captioned but not searchable.
+  // `bulkActions` counts because the strip is also where the selection bar
+  // appears, and a selectable table with no other chrome still needs it.
   const hasHeader = Boolean(
-    title || description || searchable || toolbar || showColumnToggle,
+    searchable || toolbar || showColumnToggle || (selectable && bulkActions),
   );
   const isEmpty = !loading && sorted.length === 0;
   const bulk = selectable && selection.count > 0;
