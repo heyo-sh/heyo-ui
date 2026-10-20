@@ -1,5 +1,11 @@
 # @heyo-sh/heyo-ui
 
+## 0.5.0
+
+### Minor Changes
+
+- cff4d91: Add instant, keyboard-accessible per-tick StatusBar tooltips with optional React content and multi-colour segments for partial-day outages. Existing solid ticks remain supported.
+
 ## 0.4.1
 
 ### Patch Changes
