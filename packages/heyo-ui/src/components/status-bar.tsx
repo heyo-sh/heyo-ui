@@ -2,15 +2,26 @@
 
 import type { ComponentProps, ReactNode } from "react";
 import { cn } from "../lib/cn";
+import { Tooltip } from "./tooltip";
 
 export type StatusLevel =
   "operational" | "degraded" | "partial" | "down" | "maintenance" | "unknown";
 
-export interface StatusTick {
-  /** What happened in this slice of time. */
+export interface StatusSegment {
   status: StatusLevel;
-  /** Shown in the native tooltip: a date, an incident title, a percentage. */
+  /** Share of the tick (0–100). Segments are drawn from top to bottom. */
+  percent: number;
+}
+
+export interface StatusTick {
+  /** Overall state of this slice of time. Used for solid ticks and accessibility. */
+  status: StatusLevel;
+  /** Accessible description, also shown in the tooltip unless `tooltip` is set. */
   label?: string;
+  /** Optional rich hover/focus content. Provide `label` for an accessible name. */
+  tooltip?: ReactNode;
+  /** Optional breakdown, e.g. healthy hours above a short outage. */
+  segments?: StatusSegment[];
 }
 
 const levelColor: Record<StatusLevel, string> = {
@@ -95,18 +106,56 @@ export function StatusBar({
       <div
         className={cn("flex w-full items-stretch gap-0.5", tickHeight[size])}
       >
-        {ticks.map((tick, index) => (
-          <span
-            key={index}
-            title={tick.label}
-            data-status={tick.status}
-            className={cn(
-              "min-w-0 flex-1 rounded-xs transition-opacity duration-100",
-              "hover:opacity-70",
-              levelColor[tick.status],
-            )}
-          />
-        ))}
+        {ticks.map((tick, index) => {
+          const segments = tick.segments?.filter(
+            (segment) => segment.percent > 0,
+          );
+          const content = tick.tooltip ?? tick.label;
+          const className = cn(
+            "min-w-0 flex-1 overflow-hidden rounded-xs transition-opacity duration-100",
+            content != null &&
+              "hover:opacity-70 focus-visible:outline-2 focus-visible:outline-offset-2",
+            !segments?.length && levelColor[tick.status],
+          );
+          const fill = segments?.length ? (
+            <span aria-hidden className="flex h-full w-full flex-col">
+              {segments.map((segment, segmentIndex) => (
+                <span
+                  key={segmentIndex}
+                  className={cn("min-h-0 w-full", levelColor[segment.status])}
+                  style={{
+                    flexGrow: segment.percent,
+                    flexBasis: 0,
+                    // Even a brief change stays visible at small bar sizes.
+                    minHeight: 2,
+                  }}
+                />
+              ))}
+            </span>
+          ) : null;
+
+          return content != null ? (
+            <Tooltip key={index} content={content} delay={0} closeDelay={0}>
+              <button
+                type="button"
+                aria-label={tick.label ?? `Status: ${tick.status}`}
+                data-status={tick.status}
+                className={cn(className, "cursor-default border-0 p-0")}
+              >
+                {fill}
+              </button>
+            </Tooltip>
+          ) : (
+            <span
+              key={index}
+              aria-hidden
+              data-status={tick.status}
+              className={className}
+            >
+              {fill}
+            </span>
+          );
+        })}
       </div>
 
       {legend ? (
