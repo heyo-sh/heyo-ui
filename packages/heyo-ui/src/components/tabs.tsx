@@ -109,7 +109,7 @@ function TabsList({
 const tabVariants: Record<TabsVariant, string> = {
   line: "-mb-px px-0.5 py-2",
   underline:
-    "rounded-md px-2 py-1.5 hover:bg-heyo-tint data-[selected]:font-medium",
+    "rounded-md px-2 py-1.5 hover:bg-heyo-tint data-[active]:font-medium",
   // No selected background here — the sliding indicator provides it. The tab
   // fills the track's height so the pill does too.
   segmented: "justify-center rounded-md px-3",
@@ -126,11 +126,11 @@ function TabsTab({ className, ...props }: TabsPrimitive.Tab.Props) {
         "text-sm font-medium whitespace-nowrap",
         "text-heyo-subtle transition-[background-color,color] duration-100 ease-heyo",
         "heyo-focus hover:text-heyo-default",
-        // The selected tab is the point of the component, so it gets the
-        // strongest text in the system while the rest stay subtle. Colour, not
-        // weight — a heavier selected label would re-measure the tab and jog
-        // every other one sideways.
-        "data-[selected]:text-heyo-strong",
+        // The active tab is the point of the component, so it lifts out of the
+        // subtle rest to the same "primary" text you get on hover. Colour, not
+        // weight — a heavier label would re-measure the tab and jog every other
+        // one sideways. Base UI publishes the active tab as `data-active`.
+        "data-[active]:text-heyo-default",
         "data-[disabled]:pointer-events-none data-[disabled]:text-heyo-inactive",
         tabVariants[variant],
         className,
