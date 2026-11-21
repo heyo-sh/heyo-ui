@@ -4,6 +4,7 @@ import {
   Command,
   Heading,
   Input,
+  Popover,
   Sidebar,
   Text,
   Toaster,
@@ -153,6 +154,40 @@ export function App() {
           </Sidebar.Content>
 
           <Sidebar.Footer>
+            {/* An app-wide measurement: here, a getting-started checklist. */}
+            <Popover>
+              <Popover.Trigger
+                render={
+                  <Sidebar.Meter
+                    label="Getting started"
+                    value={3}
+                    max={5}
+                    description="Next: Invite your team"
+                  />
+                }
+              />
+              <Popover.Content
+                side="right"
+                align="end"
+                sideOffset={8}
+                title="Getting started"
+                description="3 of 5 done"
+              >
+                <ol className="m-0 flex list-decimal flex-col gap-1 pl-4 text-sm text-heyo-default">
+                  <li className="text-heyo-subtle line-through">
+                    Create a project
+                  </li>
+                  <li className="text-heyo-subtle line-through">
+                    Connect a domain
+                  </li>
+                  <li className="text-heyo-subtle line-through">Deploy</li>
+                  <li className="font-medium text-heyo-strong">
+                    Invite your team
+                  </li>
+                  <li>Set up alerts</li>
+                </ol>
+              </Popover.Content>
+            </Popover>
             <Sidebar.Menu>
               <Sidebar.MenuButton
                 icon={dark ? SunIcon : MoonIcon}
