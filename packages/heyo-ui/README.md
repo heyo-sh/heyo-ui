@@ -226,6 +226,36 @@ Router links work through `render`:
 </Sidebar.MenuButton>
 ```
 
+`Sidebar.Meter` is a measurement for the whole app — an onboarding checklist,
+the days left in a trial, a storage quota — pinned to the bottom of the
+sidebar. Expanded it is a small card (label, value, bar, one line of
+description); on the collapsed rail it becomes a ring the size of an icon. It is
+always a control, so the detail is one click away: open a popover through
+`render`, or follow a link.
+
+```tsx
+<Sidebar.Footer>
+  <Popover>
+    <Popover.Trigger
+      render={
+        <Sidebar.Meter
+          label="Getting started"
+          value={3}
+          max={8}
+          description="Next: Invite your team"
+        />
+      }
+    />
+    <Popover.Content side="right" align="end">
+      …
+    </Popover.Content>
+  </Popover>
+</Sidebar.Footer>
+```
+
+`valueLabel` replaces the default `3/8` (`"10 days left"`), `tone` colours the
+bar and the ring (`brand` by default).
+
 Read or drive the state from anywhere below the provider:
 
 ```tsx

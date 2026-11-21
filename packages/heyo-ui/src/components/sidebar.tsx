@@ -605,6 +605,222 @@ SidebarMenuChevron.heyoSidebarTrailing = true;
 SidebarMenuBadge.heyoSidebarTrailing = true;
 
 /* -------------------------------------------------------------------------- */
+/*                                   Meter                                    */
+/* -------------------------------------------------------------------------- */
+
+type SidebarMeterTone = "neutral" | "brand" | "success" | "warning" | "danger";
+
+const meterFill: Record<SidebarMeterTone, string> = {
+  neutral: "bg-heyo-subtle",
+  brand: "bg-heyo-brand",
+  success: "bg-heyo-success",
+  warning: "bg-heyo-warning",
+  danger: "bg-heyo-danger",
+};
+
+const meterStroke: Record<SidebarMeterTone, string> = {
+  neutral: "stroke-heyo-subtle",
+  brand: "stroke-heyo-brand",
+  success: "stroke-heyo-success",
+  warning: "stroke-heyo-warning",
+  danger: "stroke-heyo-danger",
+};
+
+export interface SidebarMeterProps extends Omit<
+  ComponentProps<"button">,
+  "children" | "value"
+> {
+  /** What is measured: "Getting started", "Trial", "Storage". */
+  label: ReactNode;
+  value: number;
+  /** Defaults to `100`. */
+  max?: number;
+  /**
+   * The value in words, next to the label: "3/8", "12 days left", "4.2 GB".
+   * Defaults to `value/max`.
+   */
+  valueLabel?: ReactNode;
+  /** One line under the bar: the next step, what runs out and when. */
+  description?: ReactNode;
+  tone?: SidebarMeterTone;
+  /**
+   * Swap the `<button>` for whatever opens the detail — a `Popover.Trigger`,
+   * a router link. The meter itself never does anything on click.
+   */
+  render?: useRender.RenderProp;
+}
+
+/**
+ * A measurement that belongs to the whole app rather than to one page — an
+ * onboarding checklist, the days left in a trial, a storage quota — pinned to
+ * the sidebar, usually in `Sidebar.Footer` or at the bottom of `Content`.
+ *
+ * Expanded it is a small card: the label and the value on one line, the bar,
+ * and one line of description. On the collapsed icon rail the same number
+ * becomes a ring in the space of an icon, so it never disappears with the
+ * words. It is always a control: pass `render` to open a popover or follow a
+ * link, so the detail is one click away from anywhere.
+ *
+ * ```tsx
+ * <Popover>
+ *   <Popover.Trigger
+ *     render={
+ *       <Sidebar.Meter
+ *         label="Getting started"
+ *         value={3}
+ *         max={8}
+ *         description="Next: Invite your team"
+ *       />
+ *     }
+ *   />
+ *   <Popover.Content side="right" align="end">…</Popover.Content>
+ * </Popover>
+ * ```
+ *
+ * Same one bar as `Meter` (rule 10): this is where it sits, not a second kind.
+ */
+function SidebarMeter({
+  label,
+  value,
+  max = 100,
+  valueLabel,
+  description,
+  tone = "brand",
+  render,
+  className,
+  ...props
+}: SidebarMeterProps) {
+  const ratio = max > 0 ? Math.min(Math.max(value / max, 0), 1) : 0;
+  const shownValue = valueLabel ?? `${value}/${max}`;
+
+  return useRender({
+    render,
+    defaultTagName: "button",
+    props: {
+      "data-slot": "sidebar-meter",
+      type: render ? undefined : "button",
+      className: cn(
+        "group/sidebar-meter flex w-full min-w-0 cursor-pointer flex-col gap-2 text-left",
+        "rounded-lg bg-heyo-base px-3 py-2.5 ring-1 ring-heyo-hairline",
+        "heyo-focus transition-[background-color] duration-100 ease-heyo",
+        "hover:bg-heyo-tint data-[popup-open]:bg-heyo-tint",
+        // The rail: no card, just the ring where an icon would be.
+        "group-data-[state=collapsed]/sidebar:size-8 group-data-[state=collapsed]/sidebar:items-center",
+        "group-data-[state=collapsed]/sidebar:justify-center group-data-[state=collapsed]/sidebar:self-center",
+        "group-data-[state=collapsed]/sidebar:bg-transparent group-data-[state=collapsed]/sidebar:p-0",
+        "group-data-[state=collapsed]/sidebar:ring-0",
+        "group-data-[state=collapsed]/sidebar:hover:bg-heyo-tint",
+        "group-data-[mobile=true]/sidebar:size-auto group-data-[mobile=true]/sidebar:items-stretch",
+        "group-data-[mobile=true]/sidebar:bg-heyo-base group-data-[mobile=true]/sidebar:px-3",
+        "group-data-[mobile=true]/sidebar:py-2.5 group-data-[mobile=true]/sidebar:ring-1",
+        className,
+      ),
+      children: (
+        <>
+          <SidebarMeterRing ratio={ratio} tone={tone} />
+          {/* The rail hides the words, not the name: the control keeps one. */}
+          <span
+            className={cn(
+              "sr-only hidden",
+              "group-data-[state=collapsed]/sidebar:block",
+              "group-data-[mobile=true]/sidebar:hidden",
+            )}
+          >
+            {label} {shownValue}
+          </span>
+          <span
+            data-slot="sidebar-meter-body"
+            className={cn(
+              "flex min-w-0 flex-col gap-2",
+              "group-data-[state=collapsed]/sidebar:hidden",
+              "group-data-[mobile=true]/sidebar:flex",
+            )}
+          >
+            <span className="flex min-w-0 items-baseline gap-2">
+              <span className="min-w-0 flex-1 truncate text-xs font-medium text-heyo-strong">
+                {label}
+              </span>
+              <span className="shrink-0 text-xs text-heyo-subtle tabular-nums">
+                {shownValue}
+              </span>
+            </span>
+            <span
+              aria-hidden
+              className="block h-1 w-full overflow-hidden rounded-full bg-heyo-fill"
+            >
+              <span
+                className={cn(
+                  "block h-full rounded-full transition-[width] duration-300 ease-heyo",
+                  "motion-reduce:transition-none",
+                  meterFill[tone],
+                )}
+                style={{ width: `${ratio * 100}%` }}
+              />
+            </span>
+            {description ? (
+              <span className="block truncate text-xs text-heyo-subtle">
+                {description}
+              </span>
+            ) : null}
+          </span>
+        </>
+      ),
+      ...props,
+    },
+  });
+}
+
+/** The meter on the collapsed rail: a ring the size of an icon. */
+function SidebarMeterRing({
+  ratio,
+  tone,
+}: {
+  ratio: number;
+  tone: SidebarMeterTone;
+}) {
+  const radius = 6.5;
+  const circumference = 2 * Math.PI * radius;
+
+  return (
+    <svg
+      aria-hidden
+      viewBox="0 0 16 16"
+      data-slot="sidebar-meter-ring"
+      className={cn(
+        "hidden size-4 shrink-0 -rotate-90",
+        "group-data-[state=collapsed]/sidebar:block",
+        "group-data-[mobile=true]/sidebar:hidden",
+      )}
+    >
+      <circle
+        cx="8"
+        cy="8"
+        r={radius}
+        fill="none"
+        strokeWidth="2"
+        className="stroke-heyo-fill"
+      />
+      <circle
+        cx="8"
+        cy="8"
+        r={radius}
+        fill="none"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeDasharray={circumference}
+        strokeDashoffset={circumference * (1 - ratio)}
+        className={cn(
+          "transition-[stroke-dashoffset] duration-300 ease-heyo motion-reduce:transition-none",
+          // A round cap draws a dot at zero; nothing done is an empty ring.
+          ratio === 0 && "opacity-0",
+          meterStroke[tone],
+        )}
+      />
+    </svg>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
 /*                                Collapsible                                 */
 /* -------------------------------------------------------------------------- */
 
@@ -735,6 +951,7 @@ export const Sidebar = Object.assign(SidebarRoot, {
   MenuSub: SidebarMenuSub,
   MenuSubItem: SidebarMenuItem,
   MenuSubButton: SidebarMenuSubButton,
+  Meter: SidebarMeter,
   Collapsible: SidebarCollapsible,
   CollapsibleTrigger: Collapsible.Trigger,
   CollapsibleContent: SidebarCollapsibleContent,
