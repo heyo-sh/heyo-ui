@@ -27,6 +27,30 @@ export function SidebarSection() {
         </Text>
       </Example>
 
+      <Example label="Sidebar.Meter" className="block">
+        <Text size="sm" tone="subtle">
+          The card at the bottom of the sidebar: a measurement for the whole app
+          (a checklist, trial days, a quota). It opens a <Code>Popover</Code>{" "}
+          through <Code>render</Code>, and on the collapsed rail it turns into a
+          ring.
+        </Text>
+        <div className="mt-3 grid max-w-xs gap-2">
+          <Sidebar.Meter
+            label="Getting started"
+            value={3}
+            max={8}
+            description="Next: Invite your team"
+          />
+          <Sidebar.Meter
+            label="Trial"
+            value={4}
+            max={14}
+            valueLabel="10 days left"
+            tone="warning"
+          />
+        </div>
+      </Example>
+
       <Example label="parts" className="block">
         <Text size="sm" tone="subtle">
           <Code>Provider</Code> owns the state and publishes the layout
