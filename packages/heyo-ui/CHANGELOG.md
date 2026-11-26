@@ -1,5 +1,26 @@
 # @heyo-sh/heyo-ui
 
+## 0.6.0
+
+### Minor Changes
+
+- 1d53ae3: Add `Sidebar.Meter`: a measurement for the whole app — an onboarding
+  checklist, trial days, a storage quota — pinned to the bottom of the sidebar.
+
+  Expanded it is a small card with the label, the value (`3/8` or your own
+  `valueLabel`), the bar and one line of `description`; on the collapsed icon
+  rail it becomes a ring the size of an icon, so the number never disappears with
+  the words. It renders a `<button>` and takes `render`, so a `Popover.Trigger` or
+  a router link opens the detail from anywhere in the app.
+
+### Patch Changes
+
+- 88cec24: Fix `Tabs` active-tab styling. Base UI publishes the active tab as
+  `data-active`, not `data-selected`, so the selector never matched and the
+  active label stayed muted. The active tab now lifts to the same "primary" text
+  (`text-heyo-default`) you get on hover — across `line`, `underline` and
+  `segmented` — and the `underline` weight bump fires again.
+
 ## 0.5.1
 
 ### Patch Changes
